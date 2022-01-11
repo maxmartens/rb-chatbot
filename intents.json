@@ -27,13 +27,43 @@
     {
       "tag": "options",
       "patterns": ["How you could help me?", "What you can do?", "What help you provide?", "How you can be helpful?", "What support is offered"],
-      "responses": ["I can guide you through Adverse drug reaction list, Blood pressure tracking, Hospitals and Pharmacies", "Offering support for Adverse drug reaction, Blood pressure, Hospitals and Pharmacies"],
+      "responses": ["I can help you with everything around your Studies"],
       "context": [""]
     },
     {
       "tag": "change_address",
       "patterns": ["I want to change my address", "I have moved", "My new address is", "I have changed my location"],
       "responses": ["Sure, what's your new address?", "Okay, please enter your address."],
+      "context": []
+    },
+    {
+      "tag": "change_name",
+      "patterns": ["I want to change my name", "I have married", "My new name is", "I have changed my name"],
+      "responses": ["Sure, what's your new surname?", "Okay, please enter your surname."],
+      "context": []
+    },
+    {
+      "tag": "exam_reg",
+      "patterns": ["I want to register", "Register me for "],
+      "responses": ["Sure for which exam?", "Okay, please enter the name of the exam."],
+      "context": []
+    },
+    {
+      "tag": "exam_dereg",
+      "patterns": ["I want to deregister", "Deregister me for "],
+      "responses": ["Sure for which exam?", "Okay, please enter the name of the exam."],
+      "context": []
+    },
+    {
+      "tag": "paid",
+      "patterns": ["I want to pay my", "Did i pay for my "],
+      "responses": ["Let me check."],
+      "context": []
+    },
+    {
+      "tag": "multiple_intents",
+      "patterns": ["I want to deregister for an exam and change my address", "Deregister me for an exam and change my name ", "I moved and married", "I have a new name and a new address", "Can you change my name and my address?"],
+      "responses": ["Let me help you with multiple intents.."],
       "context": []
     }
   ]

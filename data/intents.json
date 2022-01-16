@@ -32,7 +32,15 @@
     },
     {
       "tag": "change_address",
-      "patterns": ["I want to change my address", "I have moved", "My new address is", "I have changed my location"],
+      "patterns": [
+        "I want to change my address to {} in {}",
+        "I have moved to {} in {}",
+        "My new address is {} in {}",
+        "I have changed my location to {} in {}",
+        "Change my address to {} in {}",
+        "I have a new address",
+        "I have a new home address"
+      ],
       "responses": ["Sure, what's your new address?", "Okay, please enter your address."],
       "context": []
     },
@@ -58,12 +66,6 @@
       "tag": "paid",
       "patterns": ["I want to pay my", "Did i pay for my "],
       "responses": ["Let me check."],
-      "context": []
-    },
-    {
-      "tag": "multiple_intents",
-      "patterns": ["I want to deregister for an exam and change my address", "Deregister me for an exam and change my name ", "I moved and married", "I have a new name and a new address", "Can you change my name and my address?"],
-      "responses": ["Let me help you with multiple intents.."],
       "context": []
     }
   ]

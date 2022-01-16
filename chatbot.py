@@ -1,3 +1,8 @@
+from address_processor import AddressProcessor
+
+debug_mode = True
+trace_mode = True
+
 import nltk
 from nltk.stem.lancaster import LancasterStemmer
 
@@ -10,11 +15,11 @@ import random
 import json
 import pickle
 
-from geotext import GeoText
-
-from address_processor import AddressProcessor
+import re
 
 nltk.download('punkt')
+
+chatbotname = 'Bo'
 
 with open("data/intents.json") as file:
     data = json.load(file)
@@ -138,13 +143,13 @@ def chat():
     matr_no = 0
     house_no = 0
     citycode = 0
-    city = []
     chatbotname = 'Bo: '
     print("Start talking with the bot!")
     while True:
         inp = input("You: ")
 
-        results = model.predict([bag_of_words(inp, words)])
+        bag = bag_of_words(inp, words)
+        results = model.predict([bag])
         # Wahrscheinlichkeit für den Tag ? print(model.score(results)) ab prozentzahl in tag 
 
         results_index = numpy.argmax(results)
@@ -153,7 +158,7 @@ def chat():
         # Wichtige Tags noch weiterer Usecases hinzufügen:
         greeting = 'greeting'
         goodbye = 'goodbye'
-        change_adress = 'change_address'
+        change_address = 'change_address'
         change_name = 'change_name'
         exam_reg = 'exam_reg'
         exam_dereg = 'exam_dereg'
@@ -162,9 +167,6 @@ def chat():
 
         # Input auf vorgeschriebene Muster/Nummern untersuchen und diese Speichern.
         house_no, exam_no, citycode, matr_no = checkingNumbers(inp, house_no, exam_no, citycode, matr_no)
-
-        # Erkennen ob Stadt mit gegeben ist
-        city = GeoText(inp).cities
 
         # Greeting mit reinnehmen Intents
         if tag == greeting:
@@ -178,16 +180,60 @@ def chat():
             break
 
         # Behandlung Use Case Umzug
-        elif tag == change_adress:
-            print(city)
-            print(change_adress)
+        elif tag == change_address:
+            debug('Use-Case:', change_address)
+            debug('User Input:', inp)
 
-            # Handling einführen
+            activated = get_activated_stems(bag, words)
+            debug('Activated stems:', activated)
+
+            inp = filter_input_by_stems(inp, activated)
+            debug('Filtered User Input:', inp)
+
             processor = AddressProcessor()
             processor.process_address_input(inp)
             address = processor.address
+            debug(f'Processed Address:', address.road, address.house_number, address.postcode, address.city)
 
-            print(f'{address.road} {address.house_number}, {address.postcode} {address.city}')
+            tries = 0
+            while tries <= 2 and len(processor.empty_members) > 0:
+                tries += 1
+                debug('Empty Members:', processor.empty_members)
+                debug('Gathering missing information try:', tries)
+
+                empty_members = ", ".join(
+                    list(map(AddressProcessor.address_member_labels.get, processor.empty_members)))
+                chatbot_out('Excuse me, I could not recognize the following parts of your address:', empty_members)
+                chatbot_out('Please enter the missing information separately.')
+
+                for member in processor.empty_members:
+                    member_input = input(f'{AddressProcessor.address_member_labels[member]}: ')
+
+                    if member == 'road':
+                        address.road = member_input
+                    if member == 'house_number':
+                        address.house_number = member_input
+                    if member == 'postcode':
+                        address.postcode = member_input
+                    if member == 'city':
+                        address.city = member_input
+
+                processor.reprocess_address(address)
+                debug('Reprocessed Address:', processor.address.road, processor.address.house_number,
+                      processor.address.postcode, processor.address.city)
+
+            if tries > 3:
+                debug('Failed three times')
+                chatbot_out('I am having problems recognizing your address. Please try something different.')
+            else:
+                changed_address = processor.address
+                debug('Final Address:', changed_address.road, changed_address.house_number, changed_address.postcode,
+                      changed_address.city)
+
+                # TODO: Datenmanipulation
+                chatbot_out(
+                    f'Great, I changed your address to {changed_address.road} {changed_address.house_number} in {changed_address.postcode} {changed_address.city}')
+
 
         elif tag == change_name:
             print(change_name)
@@ -278,8 +324,8 @@ def deregister_exam(matr_no, exam_no):
     print(exam_no)
 
 
-def changeAdress(matr_no, citycode, city, street, housenumber):
-    print(citycode)
+def changeAdress(matr_no, address):
+    print(matr_no, address)
 
 
 def changeName(matr_no, name, surname):
@@ -290,7 +336,29 @@ def checkPaid(matr_no):
     return True
 
 
+def get_activated_stems(bag_of_words, stems):
+    activated = []
+    for i in range(len(bag_of_words)):
+        if bag_of_words[i] == 1:
+            activated.append(stems[i])
+
+    return activated
+
+def filter_input_by_stems(input, stems):
+    for stem in stems:
+        pattern = r'\b' + stem + r'.{0,3}?\s?\b'
+        input = re.sub(pattern, '', input, flags=re.IGNORECASE)
+
+    return input
+
 # Matr No noch auslagern? -> nicht null und valide !
 
+def chatbot_out(*vars):
+    message = " ".join(list(vars))
+    print(f'{chatbotname}:', message)
+
+def debug(*vars):
+    if debug_mode:
+        print('[DEBUG]', vars)
 
 chat()

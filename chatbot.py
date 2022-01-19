@@ -19,8 +19,8 @@ import re
 
 nltk.download('punkt')
 
-
-from address_processor import AddressProcessor
+if unix:
+    from address_processor import AddressProcessor
 
 
 chatbotname = 'Bo'
@@ -139,10 +139,6 @@ print(courses_df)
 
 def chat():
     # Wichtige Zahlen vorderfinieren als 0
-    exam_no = 0
-    matr_no = 0
-    house_no = 0
-    citycode = 0
     chatbotname = 'Bo: '
     print("Start talking with the bot!")
     while True:
@@ -158,7 +154,7 @@ def chat():
         # Wichtige Tags noch weiterer Usecases hinzufügen:
         greeting = 'greeting'
         goodbye = 'goodbye'
-        change_address = 'change_address'
+        change_address_tag = 'change_address'
         change_name = 'change_name'
         exam_reg = 'exam_reg'
         exam_dereg = 'exam_dereg'
@@ -166,7 +162,7 @@ def chat():
         multiple_intents = 'multiple_intents'
 
         # Input auf vorgeschriebene Muster/Nummern untersuchen und diese Speichern.
-        house_no, exam_no, citycode, matr_no = checkingNumbers(inp, house_no, exam_no, citycode, matr_no)
+        house_no, exam_no, citycode, matr_no = checkingNumbers(inp)
 
         # Greeting mit reinnehmen Intents
         if tag == greeting:
@@ -180,9 +176,9 @@ def chat():
             break
 
         # Behandlung Use Case Umzug
-        elif tag == change_address:
+        elif tag == change_address_tag:
             if unix:
-                debug('Use-Case:', change_address)
+                debug('Use-Case:', change_address_tag)
                 debug('User Input:', inp)
 
                 activated = get_activated_stems(bag, words)
@@ -228,7 +224,7 @@ def chat():
                     chatbot_out('I am having problems recognizing your address. Please try something different I can help you with.')
                 else:
                     new_address = processor.address
-                    changeAddress('7234562', new_address)
+                    change_address('7234562', new_address)
                     chatbot_out(
                         f'Great, I changed your address to {new_address.road} {new_address.house_number} in {new_address.postcode} {new_address.city}')
 
@@ -243,23 +239,28 @@ def chat():
             while (matr_no == 0):  # Solange User keine Matrikelnummer eingibt hier gefangen
                 print(chatbotname + 'Please enter your matriculation number.')
                 inp = input('You:')
-                _, _, _, matr_no = checkingNumbers(inp, house_no, exam_no, citycode, matr_no)
+                _, _, _, matr_no = checkingNumbers(inp)
+
+            exam_no = 0
             while (exam_no == 0):
                 print(chatbotname + 'Please enter your exam number.')
                 inp = input('You:')
-                _, exam_no, _, _ = checkingNumbers(inp, house_no, exam_no, citycode, matr_no)
+                _, exam_no, _, _ = checkingNumbers(inp)
             register_exam(matr_no, exam_no)
+            print(student_entries_df)
 
 
         elif tag == exam_dereg:
-            while (matr_no == 0):  # Solange User keine Matrikelnummer eingibt hier gefangen
+            while matr_no or exam_no:  # Solange User keine Matrikelnummer eingibt hier gefangen
                 print(chatbotname + 'Please enter your matriculation number.')
                 inp = input('You:')
-                _, _, _, matr_no = checkingNumbers(inp, house_no, exam_no, citycode, matr_no)
+                _, _, _, matr_no = checkingNumbers(inp)
+
+            exam_no = 0
             while (exam_no == 0):
                 print(chatbotname + 'Please enter your exam number.')
                 inp = input('You:')
-                _, exam_no, _, _ = checkingNumbers(inp, house_no, exam_no, citycode, matr_no)
+                _, exam_no, _, _ = checkingNumbers(inp)
             deregister_exam(matr_no, exam_no)
 
         elif tag == paid:
@@ -276,7 +277,8 @@ def chat():
             print(chatbotname + 'Sorry i didnt understand that.')
 
 
-def checkingNumbers(inp, house_no, exam_no, citycode, matr_no):
+def checkingNumbers(inp):
+    house_no, exam_no, citycode, matr_no = 0, 0, 0, 0
     inp_token = nltk.word_tokenize(inp)
 
     house_no_token = None
@@ -352,8 +354,20 @@ def deregister_exam(matr_no , exam_no):
     else:
         print('Invalid matriculation number or exam number, please check again')
 
-def changeAdress(matr_no, citycode, city, street, housenumber):
-    print(citycode)
+
+def change_address(matriculation_number, address):
+    debug('Change Address for:', matriculation_number)
+    debug('New Address:', address.road, address.house_number, address.postcode, address.city)
+
+    index = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)][0]
+    debug('Index for given matriculation:', index)
+    if index is not None:
+        student_entries_df.loc[index, ['road', 'house_number', 'postcode', 'city']] = [address.road, address.house_number, address.postcode, address.city]
+        debug('Data Row with new address:', student_entries_df.iloc[index])
+
+    else:
+        debug('No index found for:', matriculation_number)
+
 
 def changeName(matr_no, name, surname):
     print(matr_no)

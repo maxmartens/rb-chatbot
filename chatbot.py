@@ -295,31 +295,48 @@ def checkingNumbers(inp, house_no, exam_no, citycode, matr_no):
 
 
 def register_exam(matr_no, exam_no):
-    # exam no und matr no im df checken ob vorhadnen?
-    # wenn ja registern wenn nein gibt kein exam / studenten
-    print()
+    # check for matr_no and exam_no
+    matriculation_numbers = student_entries_df['Matriculation_number'].values
 
+    if str(matr_no) in matriculation_numbers and str(exam_no) in courses_df['ID_Subject'].values:
+        student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
+        student_row = student_entries_df.iloc[student_row_index]
+        registered_exam = student_row['Applied_Exam']
 
-def deregister_exam(matr_no, exam_no):
-    print('deregister')
-    print('matr_no:')
-    print(matr_no)
-    print('exam_no:')
-    print(exam_no)
+        if str(exam_no) == str(registered_exam):
+            print('no update: subject_id already exists')
 
+        else:
+            print('update: register for exam')
+            student_entries_df.loc[student_row_index, 'Applied_Exam'] = str(exam_no)
 
-def changeAddress(matriculation_number, address):
-    debug('Change Address for:', matriculation_number)
-    debug('New Address:', address.road, address.house_number, address.postcode, address.city)
-
-    index = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)][0]
-    debug('Index for given matriculation:', index)
-    if index is not None:
-        student_entries_df.loc[index, ['road', 'house_number', 'postcode', 'city']] = [address.road, address.house_number, address.postcode, address.city]
-        debug('Data Row with new address:', student_entries_df.iloc[index])
-
+        print(student_entries_df)
     else:
-        debug('No index found for:', matriculation_number)
+        print('Invalid matriculation number or exam number, please check again')
+
+
+def deregister_exam(matr_no , exam_no):
+    # check for matr_no and exam_no
+    matriculation_numbers = student_entries_df['Matriculation_number'].values
+
+    if str(matr_no) in matriculation_numbers and str(exam_no) in student_entries_df['Applied_Exam'].values:
+        student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
+        student_row = student_entries_df.iloc[student_row_index]
+        registered_exam = student_row['Applied_Exam'][1]
+
+        if str(exam_no) == str(registered_exam):
+            print('update: deregister from exam')
+            student_entries_df.loc[student_row_index, 'Applied_Exam'] = str(0)
+
+        else:
+            print('no update: you are not registered for the given exam_no: ' + str(exam_no))
+
+        print(student_entries_df)
+    else:
+        print('Invalid matriculation number or exam number, please check again')
+
+def changeAdress(matr_no, citycode, city, street, housenumber):
+    print(citycode)
 
 def changeName(matr_no, name, surname):
     print(matr_no)

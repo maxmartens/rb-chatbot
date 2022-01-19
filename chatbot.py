@@ -116,25 +116,13 @@ def bag_of_words(s, words):
 import pandas as pd
 import numpy as np
 
-numpy_arr = np.array([
-    [7234562, 'Anna', 'Mueller', 'Marienstr.', 12, 'Duesseldorf', 56789, 1234, '1.3', 1245, '2.3', 5556],
-    [7166521, 'Markus', 'Shmidt', 'Volklingerstr.', 5, 'Koeln', 50667, 5678, '1.3', 6547, '2.0', 4567],
-    [7345673, 'Maria', 'Xi', 'Feldweg', 2, 'Duesseldorf', 40210, 1234, '1,7', 1245, '2.0', 4567],
-    [7623451, 'Philipp', 'Nowak', 'Galenstr', 5, 'Dortmund', 44137, 5678, 3.0, 6547, '1.0', 5556],
-    [7122456, 'Christian', 'Klassen', 'Bachfeld', 6, 'Dortmund', 44138, 1234, 4.0, 1245, '1.3', 5556]
-], dtype=object)
+student_entries = np.array([['7234562', 'Anna', 'Mueller', 'Marienstr.', '12', 'Duesseldorf', '56789', '1234', '1.3', '1245', '2.3', '5556'], ['7166521', 'Markus', 'Shmidt', 'Volklingerstr.', '5', 'Koeln', '50667', '5678', '1.3', '6547', '2.0', '4567'], ['7345673', 'Maria', 'Xi', 'Feldweg', '2', 'Duesseldorf', '40210', '1234', '1.7', '1245', '2.0', '4567'], ['7623451', 'Philipp', 'Nowak', 'Galenstr', '5', 'Dortmund', '44137', '5678', '3.0', '6547', '1.0', '5556'], ['7122456', 'Christian', 'Klassen', 'Bachfeld', '6', 'Dortmund', '44138', '1234', '4.0', '1245', '1.3', '5556']], dtype=object)
+student_entries_df = pd.DataFrame(student_entries, columns = ['Matriculation_number', 'Name', 'Surname', 'road', 'house_number', 'city', 'postcode', 'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2', 'Passed_Exam2_Grade', 'Applied_Exam'])
+print(student_entries_df)
 
-df = pd.DataFrame(numpy_arr,
-                  columns=['Matriculation_number', 'Name', 'Surname', 'Street', 'House_number', 'City', 'ZIP',
-                           'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2', 'Passed_Exam2_Grade', 'Applied_Exam'])
-print(df)
-
-Course = np.array(
-    [[1234, 'Physics'], [5678, 'Economics'], [1245, 'English'], [6547, 'Mathematics1'], [5556, 'Mathematics2'],
-     [4567, 'Object_Oriented_Programming'], [1111, 'Parallel_Programming'], [1112, 'Prolog_with_Applications'],
-     [1113, 'Compiler_Construction'], [1114, 'Model_Driven_Software_Development']], dtype=object)
-df = pd.DataFrame(Course, columns=['ID_Subject', 'Subjects_Name'])
-print(df)
+courses = np.array([['1234', 'Physics'], ['5678', 'Economics'], ['1245', 'English'], ['6547', 'Mathematics1'], ['5556', 'Mathematics2'], ['4567', 'Object_Oriented_Programming'], ['1111', 'Parallel_Programming'], ['1112', 'Prolog_with_Applications'], ['1113', 'Compiler_Construction'], ['1114', 'Model_Driven_Software_Development']], dtype=object)
+courses_df = pd.DataFrame(courses, columns = ['ID_Subject', 'Subjects_Name'])
+print(courses_df)
 
 
 def chat():

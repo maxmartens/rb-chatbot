@@ -214,13 +214,9 @@ def chat():
                 debug('Failed three times')
                 chatbot_out('I am having problems recognizing your address. Please try something different.')
             else:
-                changed_address = processor.address
-                debug('Final Address:', changed_address.road, changed_address.house_number, changed_address.postcode,
-                      changed_address.city)
-
-                # TODO: Datenmanipulation
-                chatbot_out(
-                    f'Great, I changed your address to {changed_address.road} {changed_address.house_number} in {changed_address.postcode} {changed_address.city}')
+                new_address = processor.address
+                changeAddress('7234562', new_address)
+                chatbot_out(f'Great, I changed your address to {new_address.road} {new_address.house_number} in {new_address.postcode} {new_address.city}')
 
 
         elif tag == change_name:
@@ -312,9 +308,18 @@ def deregister_exam(matr_no, exam_no):
     print(exam_no)
 
 
-def changeAdress(matr_no, address):
-    print(matr_no, address)
+def changeAddress(matriculation_number, address):
+    debug('Change Address for:', matriculation_number)
+    debug('New Address:', address.road, address.house_number, address.postcode, address.city)
 
+    index = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)][0]
+    debug('Index for given matriculation:', index)
+    if index is not None:
+        student_entries_df.loc[index, ['road', 'house_number', 'postcode', 'city']] = [address.road, address.house_number, address.postcode, address.city]
+        debug('Data Row with new address:', student_entries_df.iloc[index])
+
+    else:
+        debug('No index found for:', matriculation_number)
 
 def changeName(matr_no, name, surname):
     print(matr_no)

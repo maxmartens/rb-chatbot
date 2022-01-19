@@ -1,7 +1,7 @@
-from address_processor import AddressProcessor
+from sys import platform
 
+unix = "darwin" in platform or "linux" in platform
 debug_mode = True
-trace_mode = True
 
 import nltk
 from nltk.stem.lancaster import LancasterStemmer
@@ -19,7 +19,19 @@ import re
 
 nltk.download('punkt')
 
+
+from address_processor import AddressProcessor
+
+
 chatbotname = 'Bo'
+def chatbot_out(*vars):
+    message = " ".join(list(vars))
+    print(f'{chatbotname}:', message)
+
+
+def debug(*vars):
+    if debug_mode:
+        print('[DEBUG]', vars)
 
 with open("data/intents.json") as file:
     data = json.load(file)
@@ -169,55 +181,60 @@ def chat():
 
         # Behandlung Use Case Umzug
         elif tag == change_address:
-            debug('Use-Case:', change_address)
-            debug('User Input:', inp)
+            if unix:
+                debug('Use-Case:', change_address)
+                debug('User Input:', inp)
 
-            activated = get_activated_stems(bag, words)
-            debug('Activated stems:', activated)
+                activated = get_activated_stems(bag, words)
+                debug('Activated stems:', activated)
 
-            inp = filter_input_by_stems(inp, activated)
-            debug('Filtered User Input:', inp)
+                inp = filter_input_by_stems(inp, activated)
+                debug('Filtered User Input:', inp)
 
-            processor = AddressProcessor()
-            processor.process_address_input(inp)
-            address = processor.address
-            debug(f'Processed Address:', address.road, address.house_number, address.postcode, address.city)
+                processor = AddressProcessor()
+                processor.process_address_input(inp)
+                address = processor.address
+                debug(f'Processed Address:', address.road, address.house_number, address.postcode, address.city)
 
-            tries = 0
-            while tries <= 2 and len(processor.empty_members) > 0:
-                tries += 1
-                debug('Empty Members:', processor.empty_members)
-                debug('Gathering missing information try:', tries)
+                tries = 0
+                while tries <= 2 and len(processor.empty_members) > 0:
+                    tries += 1
+                    debug('Empty Members:', processor.empty_members)
+                    debug('Gathering missing information try:', tries)
 
-                empty_members = ", ".join(
-                    list(map(AddressProcessor.address_member_labels.get, processor.empty_members)))
-                chatbot_out('Excuse me, I could not recognize the following parts of your address:', empty_members)
-                chatbot_out('Please enter the missing information separately.')
+                    empty_members = ", ".join(
+                        list(map(AddressProcessor.address_member_labels.get, processor.empty_members)))
+                    chatbot_out('Excuse me, I could not recognize the following parts of your address:', empty_members)
+                    chatbot_out('Please enter the missing information separately.')
 
-                for member in processor.empty_members:
-                    member_input = input(f'{AddressProcessor.address_member_labels[member]}: ')
+                    for member in processor.empty_members:
+                        member_input = input(f'{AddressProcessor.address_member_labels[member]}: ')
 
-                    if member == 'road':
-                        address.road = member_input
-                    if member == 'house_number':
-                        address.house_number = member_input
-                    if member == 'postcode':
-                        address.postcode = member_input
-                    if member == 'city':
-                        address.city = member_input
+                        if member == 'road':
+                            address.road = member_input
+                        if member == 'house_number':
+                            address.house_number = member_input
+                        if member == 'postcode':
+                            address.postcode = member_input
+                        if member == 'city':
+                            address.city = member_input
 
-                processor.reprocess_address(address)
-                debug('Reprocessed Address:', processor.address.road, processor.address.house_number,
-                      processor.address.postcode, processor.address.city)
+                    processor.reprocess_address(address)
+                    debug('Reprocessed Address:', processor.address.road, processor.address.house_number,
+                          processor.address.postcode, processor.address.city)
 
-            if tries > 3:
-                debug('Failed three times')
-                chatbot_out('I am having problems recognizing your address. Please try something different.')
+                if tries > 3:
+                    debug('Failed three times')
+                    chatbot_out('I am having problems recognizing your address. Please try something different I can help you with.')
+                else:
+                    new_address = processor.address
+                    changeAddress('7234562', new_address)
+                    chatbot_out(
+                        f'Great, I changed your address to {new_address.road} {new_address.house_number} in {new_address.postcode} {new_address.city}')
+
             else:
-                new_address = processor.address
-                changeAddress('7234562', new_address)
-                chatbot_out(f'Great, I changed your address to {new_address.road} {new_address.house_number} in {new_address.postcode} {new_address.city}')
-
+                chatbot_out('Seems like you are using an inferior operating system.')
+                chatbot_out('Please switch to an UNIX-based OS and be awesome.')
 
         elif tag == change_name:
             print(change_name)
@@ -346,12 +363,7 @@ def filter_input_by_stems(input, stems):
 
 # Matr No noch auslagern? -> nicht null und valide !
 
-def chatbot_out(*vars):
-    message = " ".join(list(vars))
-    print(f'{chatbotname}:', message)
+# Matr No noch auslagern? -> nicht null und valide !
 
-def debug(*vars):
-    if debug_mode:
-        print('[DEBUG]', vars)
 
 chat()

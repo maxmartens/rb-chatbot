@@ -31,6 +31,17 @@
       "context": [""]
     },
     {
+      "tag": "identification",
+      "patterns": [
+        "My name is {}",
+        "My matriculation number is {}",
+        "My mat no is {}",
+        "My name is {} and my matriculation number is {}"
+      ],
+      "responses": [],
+      "context": []
+    },
+    {
       "tag": "change_address",
       "patterns": [
         "I want to change my address to {} in {}",

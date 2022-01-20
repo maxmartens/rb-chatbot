@@ -24,6 +24,8 @@ if unix:
 
 
 chatbotname = 'Bo'
+
+
 def chatbot_out(*vars):
     message = " ".join(list(vars))
     print(f'{chatbotname}:', message)
@@ -32,6 +34,59 @@ def chatbot_out(*vars):
 def debug(*vars):
     if debug_mode:
         print('[DEBUG]', vars)
+
+
+def match_matriculation_number_from_input(input):
+    debug('Search for matriculation number in input')
+    regex = r'(?<!\d)\d{7}(?!\d)'
+    debug('Searching RegEx in input:', regex, input)
+    return re.search(regex, input)
+
+
+def matriculation_number_exists(matriculation_number):
+    debug('Check if matriculation number exists:', matriculation_number)
+    candidate_indices = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)]
+    debug('Indices for given matriculation number:', list(candidate_indices))
+    return len(candidate_indices) > 0
+
+
+def check_for_matriculation_number(inp):
+    matriculation_number = 0
+    match = match_matriculation_number_from_input(inp)
+    if match:
+        if matriculation_number_exists(match.group()):
+            matriculation_number = match.group()
+        else:
+            chatbot_out('I could not find a student with the given matriculation number.')
+
+    else:
+        chatbot_out('Please enter your matriculation number to continue.')
+        match = match_matriculation_number_from_input(user_in())
+        if match:
+            if matriculation_number_exists(match.group()):
+                matriculation_number = match.group()
+            if not matriculation_number_exists(matriculation_number):
+                chatbot_out('I could not find a student with the given matriculation number.')
+
+        retries = 0
+        while retries < 2 and not matriculation_number:
+            retries += 1
+            chatbot_out('Excuse me, I could not recognize your matriculation number.')
+            chatbot_out('Please try again.')
+
+            match = match_matriculation_number_from_input(user_in())
+            if match:
+                if matriculation_number_exists(match.group()):
+                    matriculation_number = match.group()
+                if not matriculation_number_exists(matriculation_number):
+                    chatbot_out('I could not find a student with the given matriculation number.')
+
+        if retries >= 2 and not matriculation_number:
+            chatbot_out('I am having problems recognizing your matriculation number.')
+            chatbot_out('Please choose a different action.')
+
+    return matriculation_number
+
 
 with open("data/intents.json") as file:
     data = json.load(file)

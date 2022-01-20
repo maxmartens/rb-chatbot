@@ -95,7 +95,7 @@ class AddressProcessor:
 
     def __match_address_members_from_input(self, address, input):
         if address.road:
-            road_match = self.__match_by_string(address.road, input)
+            road_match = self.__match_road_by_string(address.road, input)
             if road_match:
                 address.road = road_match.group().strip()
             else:
@@ -116,7 +116,7 @@ class AddressProcessor:
                 self.empty_members.append(AddressProcessor.postcode_key)
 
         if address.city:
-            city_match = self.__match_by_string(address.city, input)
+            city_match = self.__match_city_by_string(address.city, input)
             if city_match:
                 address.city = city_match.group().strip()
             else:
@@ -130,9 +130,16 @@ class AddressProcessor:
     def __match_postcode(self, postcode):
         return re.search(AddressProcessor.postcode_regexp, postcode)
 
-    def __match_by_string(self, string, text):
+    def __match_road_by_string(self, string, text):
         string = string.replace('.', '')
         string = string.replace(' ', r'\b.?.?\b')
         regex = fr'\b{string}\b.?'
+        # print('[DEBUG] Match String (Regex):', regex)
+        return re.search(regex, text, flags=re.IGNORECASE)
+
+    def __match_city_by_string(self, string, text):
+        string = string.replace('.', '')
+        string = string.replace(' ', r'\b.?.?\b')
+        regex = fr'\b{string}\b'
         # print('[DEBUG] Match String (Regex):', regex)
         return re.search(regex, text, flags=re.IGNORECASE)

@@ -31,6 +31,10 @@ def chatbot_out(*vars):
     print(f'{chatbotname}:', message)
 
 
+def user_in():
+    return input('You: ')
+
+
 def debug(*vars):
     if debug_mode:
         print('[DEBUG]', vars)
@@ -191,33 +195,63 @@ courses = np.array([['1234', 'Physics'], ['5678', 'Economics'], ['1245', 'Englis
 courses_df = pd.DataFrame(courses, columns = ['ID_Subject', 'Subjects_Name'])
 print(courses_df)
 
+# Wichtige Tags noch weiterer Usecases hinzufügen:
+greeting = 'greeting'
+goodbye = 'goodbye'
+identification_tag = 'identification'
+change_address_tag = 'change_address'
+change_name = 'change_name'
+exam_reg = 'exam_reg'
+exam_dereg = 'exam_dereg'
+paid = 'paid'
+
+need_matriculation = {
+    greeting: False,
+    goodbye: False,
+    identification_tag: False,
+    change_address_tag: True,
+    change_name: True,
+    exam_reg: True,
+    exam_dereg: True,
+    paid: True
+}
 
 def chat():
     # Wichtige Zahlen vorderfinieren als 0
-    chatbotname = 'Bo: '
+    matr_no = 0
     print("Start talking with the bot!")
     while True:
         inp = input("You: ")
 
         bag = bag_of_words(inp, words)
         results = model.predict([bag])
-        # Wahrscheinlichkeit für den Tag ? print(model.score(results)) ab prozentzahl in tag 
+        debug('Prediction results:', results)
+
+        accuracy_map = {}
+        for index, label in enumerate(labels):
+            accuracy_map[label] = float(list(results)[0][index])
+
+        debug('Accuracy Map:', accuracy_map)
 
         results_index = numpy.argmax(results)
+        debug('Index of maximum value:', results_index)
         tag = labels[results_index]
+        debug('Tag is:', tag)
 
-        # Wichtige Tags noch weiterer Usecases hinzufügen:
-        greeting = 'greeting'
-        goodbye = 'goodbye'
-        change_address_tag = 'change_address'
-        change_name = 'change_name'
-        exam_reg = 'exam_reg'
-        exam_dereg = 'exam_dereg'
-        paid = 'paid'
-        multiple_intents = 'multiple_intents'
+        if tag == identification_tag:
+            second_result_index = numpy.argsort(results)[0][-2]
+            debug('Index of second largest value:', second_result_index)
+            tag = labels[second_result_index]
+            debug('New tag is:', tag)
+
+        # Wahrscheinlichkeit für den Tag ? print(model.score(results)) ab prozentzahl in tag
+
+        debug('Need matriculation:', need_matriculation[tag])
+        if need_matriculation[tag] and not matr_no:
+            matr_no = check_for_matriculation_number(inp)
 
         # Input auf vorgeschriebene Muster/Nummern untersuchen und diese Speichern.
-        house_no, exam_no, citycode, matr_no = checkingNumbers(inp)
+        # house_no, exam_no, citycode, matr_no = checkingNumbers(inp)
 
         # Greeting mit reinnehmen Intents
         if tag == greeting:
@@ -247,11 +281,10 @@ def chat():
                 address = processor.address
                 debug(f'Processed Address:', address.road, address.house_number, address.postcode, address.city)
 
-                tries = 0
-                while tries <= 2 and len(processor.empty_members) > 0:
-                    tries += 1
+                retries = 0
+                while retries < 3 and len(processor.empty_members) > 0:
                     debug('Empty Members:', processor.empty_members)
-                    debug('Gathering missing information try:', tries)
+                    debug('Gathering missing information try:', retries + 1)
 
                     empty_members = ", ".join(
                         list(map(AddressProcessor.address_member_labels.get, processor.empty_members)))
@@ -274,12 +307,14 @@ def chat():
                     debug('Reprocessed Address:', processor.address.road, processor.address.house_number,
                           processor.address.postcode, processor.address.city)
 
-                if tries > 3:
+                    retries += 1
+
+                if retries >= 3 and processor.empty_members:
                     debug('Failed three times')
                     chatbot_out('I am having problems recognizing your address. Please try something different I can help you with.')
                 else:
                     new_address = processor.address
-                    change_address('7234562', new_address)
+                    change_address(matr_no, new_address)
                     chatbot_out(
                         f'Great, I changed your address to {new_address.road} {new_address.house_number} in {new_address.postcode} {new_address.city}')
 
@@ -323,9 +358,6 @@ def chat():
                 print(chatbotname + 'You dont have any open payments')
             else:
                 print(chatbotname + 'Your semesterfee is not marked as paid right now.')
-
-        elif tag == multiple_intents:
-            print(multiple_intents)
 
         # Restliche Fälle vernünftiges Handling für schrott eingaben etc finden
         else:

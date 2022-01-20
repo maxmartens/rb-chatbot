@@ -1,7 +1,10 @@
 from sys import platform
 
 unix = "darwin" in platform or "linux" in platform
-debug_mode = True
+
+from logger import Logger
+
+Logger(level=2, debug_mode=False)
 
 import nltk
 from nltk.stem.lancaster import LancasterStemmer
@@ -35,22 +38,20 @@ def user_in():
     return input('You: ')
 
 
-def debug(*vars):
-    if debug_mode:
-        print('[DEBUG]', vars)
 
 
 def match_matriculation_number_from_input(input):
-    debug('Search for matriculation number in input')
+    Logger.debug(1, 'Search for matriculation number in input')
     regex = r'(?<!\d)\d{7}(?!\d)'
-    debug('Searching RegEx in input:', regex, input)
+    Logger.debug(1, 'Searching RegEx in input:', regex, input)
     return re.search(regex, input)
 
 
 def matriculation_number_exists(matriculation_number):
-    debug('Check if matriculation number exists:', matriculation_number)
-    candidate_indices = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)]
-    debug('Indices for given matriculation number:', list(candidate_indices))
+    Logger.debug(1, 'Check if matriculation number exists:', matriculation_number)
+    candidate_indices = student_entries_df.index[
+        student_entries_df['Matriculation_number'] == str(matriculation_number)]
+    Logger.debug(1, 'Indices for given matriculation number:', list(candidate_indices))
     return len(candidate_indices) > 0
 
 
@@ -233,41 +234,41 @@ def chat():
 
         bag = bag_of_words(inp, words)
         results = model.predict([bag])
-        debug('Prediction results:', results)
+        Logger.debug(1, 'Prediction results:', results)
 
         accuracy_map = {}
         for index, label in enumerate(labels):
             accuracy_map[label] = float(list(results)[0][index])
 
-        debug('Accuracy Map:', accuracy_map)
+        Logger.debug(1, 'Accuracy Map:', accuracy_map)
 
         results_index = numpy.argmax(results)
-        debug('Index of maximum value:', results_index)
+        Logger.debug(1, 'Index of maximum value:', results_index)
         tag = labels[results_index]
-        debug('Tag is:', tag)
+        Logger.debug(1, 'Tag is:', tag)
 
         if tag == identification_tag:
-            debug('Check for matriculation number in identification')
+            Logger.debug(1, 'Check for matriculation number in identification')
             match = match_matriculation_number_from_input(inp)
             if match and matriculation_number_exists(match.group()):
                 matr_no = match.group()
-                chatbot_out(f'Hey ()!')
+                chatbot_out(f'Hey {get_firstname_by_matriculation_number(matr_no)}!')
 
             second_result_index = numpy.argsort(results)[0][-2]
-            debug('Index of second largest value:', second_result_index)
+            Logger.debug(1, 'Index of second largest value:', second_result_index)
             next_tag = labels[second_result_index]
-            debug('Second tag:', next_tag)
+            Logger.debug(1, 'Second tag:', next_tag)
             if accuracy_map[next_tag] >= 0.5:
                 tag = next_tag
-                debug('New tag is:', tag)
+                Logger.debug(1, 'New tag is:', tag)
             else:
-                debug('Accuracy for second tag too low:', accuracy_map[next_tag])
+                Logger.debug(1, 'Accuracy for second tag too low:', accuracy_map[next_tag])
                 chatbot_out('How can I help you?')
                 continue
 
         # Wahrscheinlichkeit für den Tag ? print(model.score(results)) ab prozentzahl in tag
 
-        debug('Need matriculation:', need_matriculation[tag])
+        Logger.debug(1, 'Need matriculation:', need_matriculation[tag])
         if need_matriculation[tag] and not matr_no:
             matr_no = check_for_matriculation_number(inp)
 
@@ -288,35 +289,35 @@ def chat():
         # Behandlung Use Case Umzug
         elif tag == change_address_tag:
             if unix:
-                debug('Use-Case:', change_address_tag)
-                debug('User Input:', inp)
+                Logger.debug(1, 'Use-Case:', change_address_tag)
+                Logger.debug(1, 'User Input:', inp)
 
                 activated = get_activated_stems(bag, words)
-                debug('Activated stems:', activated)
+                Logger.debug(1, 'Activated stems:', activated)
 
                 inp = filter_input_by_stems(inp, activated)
-                debug('Filtered User Input:', inp)
+                Logger.debug(1, 'Filtered User Input:', inp)
 
                 processor = AddressProcessor()
                 processor.process_address_input(inp)
                 address = processor.address
-                debug('Processed Address:', address.road, address.house_number, address.postcode, address.city)
+                Logger.debug(1, 'Processed Address:', address.road, address.house_number, address.postcode, address.city)
 
                 retries = 0
                 if not retries and len(processor.empty_members) >= 4:
-                    debug('Frist try and all members empty')
+                    Logger.debug(1, 'Frist try and all members empty')
                     chatbot_out('Okay, what is your new address?')
                     inp = user_in()
                     inp = filter_input_by_stems(inp, activated)
-                    debug('Filtered User Input:', inp)
+                    Logger.debug(1, 'Filtered User Input:', inp)
 
                     processor.process_address_input(inp)
                     address = processor.address
-                    debug('Processed Address:', address.road, address.house_number, address.postcode, address.city)
+                    Logger.debug(1, 'Processed Address:', address.road, address.house_number, address.postcode, address.city)
 
                 while retries < 3 and len(processor.empty_members) > 0:
-                    debug('Empty Members:', processor.empty_members)
-                    debug('Gathering missing information try:', retries + 1)
+                    Logger.debug(1, 'Empty Members:', processor.empty_members)
+                    Logger.debug(1, 'Gathering missing information try:', retries + 1)
 
                     empty_members = ", ".join(
                         list(map(AddressProcessor.address_member_labels.get, processor.empty_members)))
@@ -336,14 +337,15 @@ def chat():
                             address.city = member_input
 
                     processor.reprocess_address(address)
-                    debug('Reprocessed Address:', processor.address.road, processor.address.house_number,
+                    Logger.debug(1, 'Reprocessed Address:', processor.address.road, processor.address.house_number,
                           processor.address.postcode, processor.address.city)
 
                     retries += 1
 
                 if retries >= 3 and processor.empty_members:
-                    debug('Failed three times')
-                    chatbot_out('I am having problems recognizing your address. Please try something different I can help you with.')
+                    Logger.debug(1, 'Failed three times')
+                    chatbot_out(
+                        'I am having problems recognizing your address. Please try something different I can help you with.')
                 else:
                     new_address = processor.address
                     change_address(matr_no, new_address)
@@ -474,17 +476,19 @@ def deregister_exam(matr_no , exam_no):
 
 
 def change_address(matriculation_number, address):
-    debug('Change Address for:', matriculation_number)
-    debug('New Address:', address.road, address.house_number, address.postcode, address.city)
+    Logger.debug(1, 'Change Address for:', matriculation_number)
+    Logger.debug(1, 'New Address:', address.road, address.house_number, address.postcode, address.city)
 
     index = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)][0]
-    debug('Index for given matriculation:', index)
+    Logger.debug(1, 'Index for given matriculation:', index)
     if index is not None:
-        student_entries_df.loc[index, ['road', 'house_number', 'postcode', 'city']] = [address.road, address.house_number, address.postcode, address.city]
-        debug('Data Row with new address:', student_entries_df.iloc[index])
+        student_entries_df.loc[index, ['road', 'house_number', 'postcode', 'city']] = [address.road,
+                                                                                       address.house_number,
+                                                                                       address.postcode, address.city]
+        Logger.debug(1, 'Data Row with new address:', student_entries_df.iloc[index])
 
     else:
-        debug('No index found for:', matriculation_number)
+        Logger.debug(1, 'No index found for:', matriculation_number)
 
 
 def changeName(matr_no, name, surname):
@@ -503,6 +507,7 @@ def get_activated_stems(bag_of_words, stems):
 
     return activated
 
+
 def filter_input_by_stems(input, stems):
     stems.append('in')  # Just in case ;-)
     for stem in stems:
@@ -510,6 +515,7 @@ def filter_input_by_stems(input, stems):
         input = re.sub(pattern, '', input, flags=re.IGNORECASE)
 
     return input
+
 
 # Matr No noch auslagern? -> nicht null und valide !
 

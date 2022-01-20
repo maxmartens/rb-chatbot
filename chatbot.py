@@ -277,12 +277,12 @@ def chat():
         # Greeting mit reinnehmen Intents
         if tag == greeting:
             responses = data["intents"][0]["responses"]
-            print(chatbotname + random.choice(responses))
+            chatbot_out(random.choice(responses))
 
         # Wann soll Chatbot ausgeschaltet werden?
         elif tag == goodbye:
             responses = data["intents"][1]["responses"]
-            print(chatbotname + random.choice(responses))
+            chatbot_out(random.choice(responses))
             break
 
         # Behandlung Use Case Umzug
@@ -338,7 +338,6 @@ def chat():
                     change_address(matr_no, new_address)
                     chatbot_out(
                         f'Great, I changed your address to {new_address.road} {new_address.house_number} in {new_address.postcode} {new_address.city}')
-
             else:
                 chatbot_out('Seems like you are using an inferior operating system.')
                 chatbot_out('Please switch to an UNIX-based OS and be awesome.')
@@ -348,14 +347,14 @@ def chat():
 
         elif tag == exam_reg:
             while (matr_no == 0):  # Solange User keine Matrikelnummer eingibt hier gefangen
-                print(chatbotname + 'Please enter your matriculation number.')
-                inp = input('You:')
+                chatbot_out('Please enter your matriculation number.')
+                inp = user_in()
                 _, _, _, matr_no = checkingNumbers(inp)
 
             exam_no = 0
             while (exam_no == 0):
-                print(chatbotname + 'Please enter your exam number.')
-                inp = input('You:')
+                chatbot_out('Please enter your exam number.')
+                inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
             register_exam(matr_no, exam_no)
             print(student_entries_df)
@@ -363,26 +362,26 @@ def chat():
 
         elif tag == exam_dereg:
             while matr_no or exam_no:  # Solange User keine Matrikelnummer eingibt hier gefangen
-                print(chatbotname + 'Please enter your matriculation number.')
-                inp = input('You:')
+                chatbot_out('Please enter your matriculation number.')
+                inp = user_in()
                 _, _, _, matr_no = checkingNumbers(inp)
 
             exam_no = 0
             while (exam_no == 0):
-                print(chatbotname + 'Please enter your exam number.')
-                inp = input('You:')
+                chatbot_out('Please enter your exam number.')
+                inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
             deregister_exam(matr_no, exam_no)
 
         elif tag == paid:
             if checkPaid(matr_no) == True:
-                print(chatbotname + 'You dont have any open payments')
+                chatbot_out('You dont have any open payments.')
             else:
-                print(chatbotname + 'Your semesterfee is not marked as paid right now.')
+                chatbot_out('Your semester fee is not marked as paid right now.')
 
         # Restliche Fälle vernünftiges Handling für schrott eingaben etc finden
         else:
-            print(chatbotname + 'Sorry i didnt understand that.')
+            chatbot_out('Sorry I did not understand that.')
 
 
 def checkingNumbers(inp):

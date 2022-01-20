@@ -300,9 +300,20 @@ def chat():
                 processor = AddressProcessor()
                 processor.process_address_input(inp)
                 address = processor.address
-                debug(f'Processed Address:', address.road, address.house_number, address.postcode, address.city)
+                debug('Processed Address:', address.road, address.house_number, address.postcode, address.city)
 
                 retries = 0
+                if not retries and len(processor.empty_members) >= 4:
+                    debug('Frist try and all members empty')
+                    chatbot_out('Okay, what is your new address?')
+                    inp = user_in()
+                    inp = filter_input_by_stems(inp, activated)
+                    debug('Filtered User Input:', inp)
+
+                    processor.process_address_input(inp)
+                    address = processor.address
+                    debug('Processed Address:', address.road, address.house_number, address.postcode, address.city)
+
                 while retries < 3 and len(processor.empty_members) > 0:
                     debug('Empty Members:', processor.empty_members)
                     debug('Gathering missing information try:', retries + 1)

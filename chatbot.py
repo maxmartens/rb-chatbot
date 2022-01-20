@@ -38,6 +38,13 @@ def user_in():
     return input('You: ')
 
 
+def get_firstname_by_matriculation_number(matriculation_number):
+    Logger.debug(1, 'Get firstname by matriculation number:', matriculation_number)
+    candidate_indices = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)]
+    Logger.debug(1, 'Candidate indices:', list(candidate_indices))
+    name = student_entries_df.iloc[candidate_indices[0]]['Name']
+    Logger.debug(1, 'Got name:', name)
+    return name
 
 
 def match_matriculation_number_from_input(input):

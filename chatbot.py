@@ -114,7 +114,9 @@ except:
         if intent["tag"] not in labels:
             labels.append(intent["tag"])
 
-    words = [stemmer.stem(w.lower()) for w in words if w != "?"]
+    exclusions = ["?", ",", ".", "{", "}", ":"]
+
+    words = [stemmer.stem(w.lower()) for w in words if w not in exclusions]
     words = sorted(list(set(words)))
 
     labels = sorted(labels)
@@ -153,9 +155,9 @@ net = tflearn.input_data(shape=[None, len(training[0])])
 net = tflearn.fully_connected(net, 8)
 net = tflearn.fully_connected(net, 8)
 net = tflearn.fully_connected(net, len(output[0]), activation="softmax")
-net = tflearn.regression(net)
+net = tflearn.regression(net, metric=tflearn.metrics.Accuracy())
 
-model = tflearn.DNN(net)
+model = tflearn.DNN(net, tensorboard_verbose=3)
 
 try:
     with open("model.tflearn") as chkpt:

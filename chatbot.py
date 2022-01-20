@@ -504,6 +504,7 @@ def get_activated_stems(bag_of_words, stems):
     return activated
 
 def filter_input_by_stems(input, stems):
+    stems.append('in')  # Just in case ;-)
     for stem in stems:
         pattern = r'\b' + stem + r'.{0,3}?\s?\b'
         input = re.sub(pattern, '', input, flags=re.IGNORECASE)

@@ -151,11 +151,17 @@ except:
 
 tensorflow.compat.v1.reset_default_graph()
 
-net = tflearn.input_data(shape=[None, len(training[0])])
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, len(output[0]), activation="softmax")
-net = tflearn.regression(net, metric=tflearn.metrics.Accuracy())
+input_layer_size = len(training[0])
+hidden_layer_size = round(input_layer_size * (2/3) + len(output[0]))
+
+input_layer = tflearn.input_data(shape=[None, input_layer_size])
+
+hidden_layer = tflearn.fully_connected(input_layer, hidden_layer_size, activation="relu")
+hidden_layer = tflearn.fully_connected(hidden_layer, hidden_layer_size, activation="sigmoid")
+
+output_layer = tflearn.fully_connected(hidden_layer, len(output[0]), activation="softmax")
+
+net = tflearn.regression(output_layer, metric=tflearn.metrics.Accuracy(), optimizer="rmsprop", loss="mean_square")
 
 model = tflearn.DNN(net, tensorboard_verbose=3)
 

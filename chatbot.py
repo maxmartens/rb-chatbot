@@ -241,10 +241,23 @@ def chat():
         debug('Tag is:', tag)
 
         if tag == identification_tag:
+            debug('Check for matriculation number in identification')
+            match = match_matriculation_number_from_input(inp)
+            if match and matriculation_number_exists(match.group()):
+                matr_no = match.group()
+                chatbot_out(f'Hey ()!')
+
             second_result_index = numpy.argsort(results)[0][-2]
             debug('Index of second largest value:', second_result_index)
-            tag = labels[second_result_index]
-            debug('New tag is:', tag)
+            next_tag = labels[second_result_index]
+            debug('Second tag:', next_tag)
+            if accuracy_map[next_tag] >= 0.5:
+                tag = next_tag
+                debug('New tag is:', tag)
+            else:
+                debug('Accuracy for second tag too low:', accuracy_map[next_tag])
+                chatbot_out('How can I help you?')
+                continue
 
         # Wahrscheinlichkeit für den Tag ? print(model.score(results)) ab prozentzahl in tag
 

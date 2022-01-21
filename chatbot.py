@@ -432,32 +432,30 @@ def chat():
                 chatbot_out('I have no information about the subject.')
 
         elif tag == exam_reg:
-            while (matr_no == 0):  # Solange User keine Matrikelnummer eingibt hier gefangen
-                chatbot_out('Please enter your matriculation number.')
-                inp = user_in()
-                _, _, _, matr_no = checkingNumbers(inp)
-
             exam_no = 0
-            while (exam_no == 0):
+            tries = 0
+            while exam_no == 0 and tries < 3:
+                tries += 1
                 chatbot_out('Please enter your exam number.')
                 inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
-            register_exam(matr_no, exam_no)
-            print(student_entries_df)
-
+            if exam_no:
+                register_exam(matr_no, exam_no)
+            else:
+                chatbot_out('I could not recognize the exam ID.')
 
         elif tag == exam_dereg:
-            while matr_no or exam_no:  # Solange User keine Matrikelnummer eingibt hier gefangen
-                chatbot_out('Please enter your matriculation number.')
-                inp = user_in()
-                _, _, _, matr_no = checkingNumbers(inp)
-
             exam_no = 0
-            while (exam_no == 0):
+            tries = 0
+            while exam_no == 0 and tries < 3:
+                tries += 1
                 chatbot_out('Please enter your exam number.')
                 inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
-            deregister_exam(matr_no, exam_no)
+            if exam_no:
+                deregister_exam(matr_no, exam_no)
+            else:
+                chatbot_out('I could not recognize the exam ID.')
 
         elif tag == paid:
             if checkPaid(matr_no) == True:

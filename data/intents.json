@@ -78,6 +78,18 @@
       "patterns": ["I want to pay my", "Did i pay for my "],
       "responses": ["Let me check."],
       "context": []
+    },
+    {
+      "tag": "grade_examination",
+      "patterns": ["What is my grade ?", "Can you tell me how well did I preforme in one subject", "What is my note for one subject"],
+      "responses": ["Sure, please enter the ID of the subject"],
+      "context":[]
+    },
+    {
+      "tag": "status_examination_registration",
+      "patterns": ["I want to check the status of an exam", "Can you give me the status of the exam", "I want to prove the status of an exam"],
+      "responses": ["Sure, please enter the number of the asked subject "],
+      "context": []
     }
   ]
 }

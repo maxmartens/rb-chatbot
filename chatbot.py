@@ -17,6 +17,7 @@ import tensorflow
 import random
 import json
 import pickle
+from pandasql import sqldf
 
 import re
 
@@ -225,6 +226,8 @@ change_name = 'change_name'
 exam_reg = 'exam_reg'
 exam_dereg = 'exam_dereg'
 paid = 'paid'
+grade_examination_tag = 'grade_examination'
+status_examination_registration_tag = 'status_examination_registration'
 
 need_matriculation = {
     greeting: False,
@@ -234,7 +237,9 @@ need_matriculation = {
     change_name: True,
     exam_reg: True,
     exam_dereg: True,
-    paid: True
+    paid: True,
+    grade_examination_tag: True,
+    status_examination_registration_tag: True
 }
 
 def chat():
@@ -368,7 +373,61 @@ def chat():
                 chatbot_out('Please switch to an UNIX-based OS and be awesome.')
 
         elif tag == change_name:
-            print(change_name)
+            chatbot_out('Add your new surname.')
+            d = user_in()
+            student_entries_df["Surname"] = numpy.where(student_entries_df["Matriculation_number"] == matr_no, d, student_entries_df["Surname"])
+            chatbot_out('Your surname has been successfully uploaded.')
+
+        elif tag == grade_examination_tag:
+            chatbot_out("Please enter the exam ID.")
+            b = user_in()
+
+            ppp = sqldf(f"SELECT ID_Subject={b} FROM courses_df WHERE ID_Subject={b}")
+            p = sqldf(f"SELECT Passed_Exam1_Grade FROM student_entries_df WHERE Passed_Exam1={b} and Matriculation_number={matr_no}")
+            pp = sqldf(f"SELECT Passed_Exam2_Grade FROM student_entries_df WHERE Passed_Exam2={b} and Matriculation_number={matr_no}")
+
+            leer = p.empty
+            lee = pp.empty
+            le = ppp.empty
+            aaab = leer
+            aaa = lee
+            aa = le
+
+            if (aaab == 0) & (aaa != 0) & (aa == 0):
+                chatbot_out("Your Grade for the entered Exam is", p.iat[0, 0])
+            elif (aaab != 0) & (aaa == 0) & (aa == 0):
+                chatbot_out("Your Grade for the entered Exam is", pp.iat[0, 0])
+            elif (aaab != 0) & (aaa != 0) & (aa == 0):
+                chatbot_out("I am sorry the given subject hasn't been passed yet.")
+            else:
+                chatbot_out("You entered a wrong number.")
+
+        elif tag == status_examination_registration_tag:
+            chatbot_out('Please enter the exam ID.')
+            b = user_in()
+            q = sqldf(f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={b} and Matriculation_number={matr_no}")
+            qq = sqldf(f"SELECT Matriculation_number={matr_no} FROM student_entries_df WHERE Passed_Exam2={b} and Matriculation_number={matr_no}")
+            qqq = sqldf(f"SELECT Applied_Exam FROM student_entries_df WHERE Applied_Exam={b} and Matriculation_number={matr_no}")
+            qqqq = sqldf(f"SELECT ID_Subject FROM courses_df WHERE ID_Subject={b}")
+
+            isempty = q.empty
+            isempt = qq.empty
+            isemp = qqq.empty
+            isem = qqqq.empty
+            ter = isempty
+            te = isempt
+            tee = isemp
+            teee = isem
+            if (ter == 0) & (te != 0) & (tee != 0) & (teee == 0):
+                chatbot_out("You already completed the Exam.")
+            elif (ter != 0) & (te == 0) & (tee != 0) & (teee == 0):
+                chatbot_out("You already completed the Exam.")
+            elif (ter != 0) & (te != 0) & (tee == 0) & (teee == 0):
+                chatbot_out("The exam was applied.")
+            elif (ter != 0) & (te != 0) & (tee != 0) & (teee == 0):
+                chatbot_out("You haven't registered for the exam yet.")
+            else:
+                chatbot_out('I have no information about the subject.')
 
         elif tag == exam_reg:
             while (matr_no == 0):  # Solange User keine Matrikelnummer eingibt hier gefangen

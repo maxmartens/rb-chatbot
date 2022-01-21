@@ -39,13 +39,15 @@ def user_in():
     return input('You: ')
 
 
-def get_firstname_by_matriculation_number(matriculation_number):
+def get_full_name_by_matriculation_number(matriculation_number):
     Logger.debug(1, 'Get firstname by matriculation number:', matriculation_number)
     candidate_indices = student_entries_df.index[student_entries_df['Matriculation_number'] == str(matriculation_number)]
     Logger.debug(1, 'Candidate indices:', list(candidate_indices))
-    name = student_entries_df.iloc[candidate_indices[0]]['Name']
-    Logger.debug(1, 'Got name:', name)
-    return name
+    firstname = student_entries_df.iloc[candidate_indices[0]]['Name']
+    Logger.debug(1, 'Got firstname:', firstname)
+    surname = student_entries_df.iloc[candidate_indices[0]]['Surname']
+    Logger.debug(1, 'Got surname:', surname)
+    return f'{firstname} {surname}'
 
 
 def match_matriculation_number_from_input(input):
@@ -269,7 +271,7 @@ def chat():
             match = match_matriculation_number_from_input(inp)
             if match and matriculation_number_exists(match.group()):
                 matr_no = match.group()
-                chatbot_out(f'Hey {get_firstname_by_matriculation_number(matr_no)}!')
+                chatbot_out(f'Hey {get_full_name_by_matriculation_number(matr_no)}!')
 
             second_result_index = numpy.argsort(results)[0][-2]
             Logger.debug(1, 'Index of second largest value:', second_result_index)

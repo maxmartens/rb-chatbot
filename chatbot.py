@@ -203,8 +203,13 @@ def bag_of_words(s, words):
 import pandas as pd
 import numpy as np
 
-student_entries = np.array([['7234562', 'Anna', 'Mueller', 'Marienstr.', '12', 'Duesseldorf', '56789', '1234', '1.3', '1245', '2.3', '5556'], ['7166521', 'Markus', 'Shmidt', 'Volklingerstr.', '5', 'Koeln', '50667', '5678', '1.3', '6547', '2.0', '4567'], ['7345673', 'Maria', 'Xi', 'Feldweg', '2', 'Duesseldorf', '40210', '1234', '1.7', '1245', '2.0', '4567'], ['7623451', 'Philipp', 'Nowak', 'Galenstr', '5', 'Dortmund', '44137', '5678', '3.0', '6547', '1.0', '5556'], ['7122456', 'Christian', 'Klassen', 'Bachfeld', '6', 'Dortmund', '44138', '1234', '4.0', '1245', '1.3', '5556']], dtype=object)
-student_entries_df = pd.DataFrame(student_entries, columns = ['Matriculation_number', 'Name', 'Surname', 'road', 'house_number', 'city', 'postcode', 'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2', 'Passed_Exam2_Grade', 'Applied_Exam'])
+student_entries = np.array([
+    ['7234562','Anna','Mueller','Marienstr.', '12','Duesseldorf','56789','1234','1.3','1245','2.3','5556',1],
+    ['7166521','Markus','Shmidt','Volklingerstr.','5','Koeln','50667','5678','1.3','6547','2.0','4567',0],
+    ['7345673','Maria','Xi','Feldweg','2','Duesseldorf','40210','1234','1,7','1245','2.0','4567',1],
+    ['7623451','Philipp','Nowak','Galenstr','5','Dortmund','44137','5678','3.0','6547','1.0','5556',1 ],
+    ['7122456','Christian','Klassen','Bachfeld','6','Dortmund','44138','1234','4.0','1245','1.3','5556',0]], dtype=object)
+student_entries_df = pd.DataFrame(student_entries, columns = ['Matriculation_number','Name','Surname','road','house_number','city', 'postcode', 'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2','Passed_Exam2_Grade', 'Applied_Exam','SemesterFeePaid' ])
 print(student_entries_df)
 
 courses = np.array([['1234', 'Physics'], ['5678', 'Economics'], ['1245', 'English'], ['6547', 'Mathematics1'], ['5556', 'Mathematics2'], ['4567', 'Object_Oriented_Programming'], ['1111', 'Parallel_Programming'], ['1112', 'Prolog_with_Applications'], ['1113', 'Compiler_Construction'], ['1114', 'Model_Driven_Software_Development']], dtype=object)
@@ -404,6 +409,7 @@ def chat():
             chatbot_out('Sorry I did not understand that.')
 
 
+# Hilfunsfunktionen
 def checkingNumbers(inp):
     house_no, exam_no, citycode, matr_no = 0, 0, 0, 0
     inp_token = nltk.word_tokenize(inp)
@@ -415,28 +421,20 @@ def checkingNumbers(inp):
 
         # Wenn Hausnummern dann ist token davor wsl -> Straße
         # Wenn PLZ ist token danach wsl -> Stadt
-
         try:
             number = int(token)
-            if (000 <= number <= 999):
-                house_no = number
-                print('housenumber')
-                print(house_no)
-                print(inp_token)
-            if (1000 <= number <= 9999):
+            if (len(token) == 4):
                 exam_no = number
-                print('exam')
+                print('exam') # TODO: Debugging
                 print(exam_no)
-            if (10000 <= number <= 99999):
-                citycode = number
-                print('city')
-                print(citycode)
-            if (1000000 <= number <= 9999999):
+            if (len(token) == 7):
                 matr_no = number
                 print('matr')
                 print(matr_no)
+
         except:
             pass
+
     return house_no, exam_no, citycode, matr_no
 
 
@@ -503,7 +501,7 @@ def changeName(matr_no, name, surname):
 
 
 def checkPaid(matr_no):
-    return True
+    return bool(int(student_entries_df[student_entries_df.Matriculation_number==matr_no].SemesterFeePaid))
 
 
 def get_activated_stems(bag_of_words, stems):
@@ -522,11 +520,6 @@ def filter_input_by_stems(input, stems):
         input = re.sub(pattern, '', input, flags=re.IGNORECASE)
 
     return input
-
-
-# Matr No noch auslagern? -> nicht null und valide !
-
-# Matr No noch auslagern? -> nicht null und valide !
 
 
 chat()

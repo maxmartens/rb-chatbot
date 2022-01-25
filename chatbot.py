@@ -299,11 +299,13 @@ def chat():
             responses = data["intents"][0]["responses"]
             chatbot_out(random.choice(responses))
 
+
         # Wann soll Chatbot ausgeschaltet werden?
         elif tag == goodbye:
             responses = data["intents"][1]["responses"]
             chatbot_out(random.choice(responses))
             break
+
 
         # Behandlung Use Case Umzug
         elif tag == change_address_tag:
@@ -497,7 +499,7 @@ def register_exam(matr_no, exam_no):
         print('Invalid matriculation number or exam number, please check again')
 
 
-def deregister_exam(matr_no , exam_no):
+def deregister_exam(matr_no, exam_no):
     # check for matr_no and exam_no
     matriculation_numbers = student_entries_df['Matriculation_number'].values
 
@@ -534,11 +536,7 @@ def change_address(matriculation_number, address):
         Logger.debug(1, 'No index found for:', matriculation_number)
 
 
-def changeName(matr_no, name, surname):
-    print(matr_no)
-
-
-def checkPaid(matr_no):
+def check_paid(matr_no):
     return bool(int(student_entries_df[student_entries_df.Matriculation_number==matr_no].SemesterFeePaid))
 
 

@@ -63,13 +63,30 @@
     },
     {
       "tag": "exam_reg",
-      "patterns": ["I want to register", "Register me for "],
+      "patterns": [
+        "I want to register",
+        "I would like to register",
+        "Please register me",
+        "Could I be registered?",
+        "Register me",
+        "Can you register me?",
+        "Add another exam registration",
+        "Replace my exam registration"
+      ],
       "responses": ["Sure for which exam?", "Okay, please enter the name of the exam."],
       "context": []
     },
     {
       "tag": "exam_dereg",
-      "patterns": ["I want to deregister", "Deregister me for "],
+      "patterns": [
+        "I want to deregister",
+        "I would like to deregister",
+        "Please deregister me",
+        "Could I be deregistered?",
+        "Deregister me",
+        "Can you deregister me?",
+        "Delete my exam registration"
+      ],
       "responses": ["Sure for which exam?", "Okay, please enter the name of the exam."],
       "context": []
     },

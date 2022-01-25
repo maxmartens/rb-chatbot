@@ -1,8 +1,12 @@
 import re
+from sys import platform
+
+unix = "darwin" in platform or "linux" in platform
+
+if unix:
+    from postal.parser import parse_address
 
 from logger import Logger
-
-from postal.parser import parse_address
 
 from address import Address
 

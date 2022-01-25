@@ -488,46 +488,43 @@ def register_exam(matr_no, exam_no):
     matriculation_numbers = student_entries_df['Matriculation_number'].values
     subjects = courses_df['ID_Subject'].values
 
-    if str(matr_no) in matriculation_numbers and str(exam_no) in subjects:
+    if str(exam_no) in subjects:
         student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
         student_row = student_entries_df.iloc[student_row_index]
         registered_exam = student_row['Applied_Exam']
 
         if str(exam_no) == str(registered_exam):
-            print('no update: subject_id already exists in registered exam')
+            chatbot_out(f'You are already registered for this exam ({exam_no}).')
 
         elif str(exam_no) in student_row.values:
-            print('no update: subject_id already exists in written exams')
+            chatbot_out(f'You have already completed this exam ({exam_no}).')
 
         else:
-            print('update: register for exam')
             student_entries_df.loc[student_row_index, 'Applied_Exam'] = str(exam_no)
+            chatbot_out(f'You were successfully registered for the exam ({exam_no}).')
 
-        print(student_entries_df)
     else:
-        print('Invalid matriculation number or exam number, please check again')
+        chatbot_out(f'Excuse me, I could not find this exam ({exam_no}).')
 
 
 def deregister_exam(matr_no, exam_no):
-    # check for matr_no and exam_no
     matriculation_numbers = student_entries_df['Matriculation_number'].values
     applied_exams = student_entries_df['Applied_Exam'].values
 
-    if str(matr_no) in matriculation_numbers and str(exam_no) in applied_exams:
+    if str(exam_no) in applied_exams:
         student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
         student_row = student_entries_df.iloc[student_row_index]
-        registered_exam = student_row['Applied_Exam'][1]
+        registered_exam = student_row['Applied_Exam'][0]
 
         if str(exam_no) == str(registered_exam):
-            print('update: deregister from exam')
             student_entries_df.loc[student_row_index, 'Applied_Exam'] = str(0)
+            chatbot_out(f'You were successfully deregistered from the exam ({exam_no}).')
 
         else:
-            print('no update: you are not registered for the given exam_no: ' + str(exam_no))
+            chatbot_out(f'You are not registered for this exam ({exam_no}).')
 
-        print(student_entries_df)
     else:
-        print('Invalid matriculation number or exam number, please check again')
+        chatbot_out(f'Excuse me, I could not find this exam ({exam_no}).')
 
 
 def change_address(matriculation_number, address):

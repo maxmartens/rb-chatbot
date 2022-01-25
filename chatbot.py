@@ -209,7 +209,17 @@ student_entries = np.array([
 student_entries_df = pd.DataFrame(student_entries, columns = ['Matriculation_number','Name','Surname','road','house_number','city', 'postcode', 'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2','Passed_Exam2_Grade', 'Applied_Exam','SemesterFeePaid' ])
 Logger.debug(1, 'Student entries data frame:', student_entries_df)
 
-courses = np.array([['1234', 'Physics'], ['5678', 'Economics'], ['1245', 'English'], ['6547', 'Mathematics1'], ['5556', 'Mathematics2'], ['4567', 'Object_Oriented_Programming'], ['1111', 'Parallel_Programming'], ['1112', 'Prolog_with_Applications'], ['1113', 'Compiler_Construction'], ['1114', 'Model_Driven_Software_Development']], dtype=object)
+courses = np.array([
+    ['1234', 'Physics'],
+    ['5678', 'Economics'],
+    ['1245', 'English'],
+    ['6547', 'Mathematics1'],
+    ['5556', 'Mathematics2'],
+    ['4567', 'Object_Oriented_Programming'],
+    ['1111', 'Parallel_Programming'],
+    ['1112', 'Prolog_with_Applications'],
+    ['1113', 'Compiler_Construction'],
+    ['1114', 'Model_Driven_Software_Development']], dtype=object)
 courses_df = pd.DataFrame(courses, columns = ['ID_Subject', 'Subjects_Name'])
 Logger.debug(1, 'Courses data frame:', courses_df)
 
@@ -472,16 +482,19 @@ def check_exam_number(inp):
 
 
 def register_exam(matr_no, exam_no):
-    # check for matr_no and exam_no
     matriculation_numbers = student_entries_df['Matriculation_number'].values
+    subjects = courses_df['ID_Subject'].values
 
-    if str(matr_no) in matriculation_numbers and str(exam_no) in courses_df['ID_Subject'].values:
+    if str(matr_no) in matriculation_numbers and str(exam_no) in subjects:
         student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
         student_row = student_entries_df.iloc[student_row_index]
         registered_exam = student_row['Applied_Exam']
 
         if str(exam_no) == str(registered_exam):
-            print('no update: subject_id already exists')
+            print('no update: subject_id already exists in registered exam')
+
+        elif str(exam_no) in student_row.values:
+            print('no update: subject_id already exists in written exams')
 
         else:
             print('update: register for exam')
@@ -495,8 +508,9 @@ def register_exam(matr_no, exam_no):
 def deregister_exam(matr_no, exam_no):
     # check for matr_no and exam_no
     matriculation_numbers = student_entries_df['Matriculation_number'].values
+    applied_exams = student_entries_df['Applied_Exam'].values
 
-    if str(matr_no) in matriculation_numbers and str(exam_no) in student_entries_df['Applied_Exam'].values:
+    if str(matr_no) in matriculation_numbers and str(exam_no) in applied_exams:
         student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
         student_row = student_entries_df.iloc[student_row_index]
         registered_exam = student_row['Applied_Exam'][1]

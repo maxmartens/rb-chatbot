@@ -516,8 +516,11 @@ def register_exam(matr_no, exam_no):
         student_row = student_entries_df.iloc[student_row_index]
         registered_exam = student_row['Applied_Exam']
 
-        if str(exam_no) == str(registered_exam) or exam_number_exists_for_student(exam_no, student_row):
-            print('no update: subject_id already exists')
+        if str(exam_no) == str(registered_exam):
+            print('no update: subject_id already exists in registered exam')
+
+        elif str(exam_no) in student_row.values:
+            print('no update: subject_id already exists in written exams')
 
         else:
             print('update: register for exam')
@@ -530,14 +533,14 @@ def register_exam(matr_no, exam_no):
 
 def deregister_exam(matr_no , exam_no):
     matriculation_numbers = student_entries_df['Matriculation_number'].values
-    applied_exams = student_entries_df['Applied_Exam'].values;
+    applied_exams = student_entries_df['Applied_Exam'].values
 
     if str(matr_no) in matriculation_numbers and str(exam_no) in applied_exams:
         student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
         student_row = student_entries_df.iloc[student_row_index]
         registered_exam = student_row['Applied_Exam'][1]
 
-        if str(exam_no) == str(registered_exam) and exam_number_exists_for_student(exam_no, student_row):
+        if str(exam_no) == str(registered_exam):
             print('update: deregister from exam')
             student_entries_df.loc[student_row_index, 'Applied_Exam'] = str(0)
 
@@ -547,14 +550,6 @@ def deregister_exam(matr_no , exam_no):
         print(student_entries_df)
     else:
         print('Invalid matriculation number or exam number, please check again')
-
-
-def exam_number_exists_for_student(exam_no, student_row):
-    if str(exam_no) in student_row:
-        return True
-    else:
-        return False
-
 
 
 def change_address(matriculation_number, address):

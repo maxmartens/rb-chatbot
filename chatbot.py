@@ -1,3 +1,4 @@
+import os.path
 from sys import platform
 
 unix = "darwin" in platform or "linux" in platform
@@ -176,15 +177,12 @@ net = tflearn.regression(output_layer, metric=tflearn.metrics.Accuracy(), optimi
 
 model = tflearn.DNN(net, tensorboard_verbose=3)
 
-try:
-    with open("model.tflearn") as chkpt:
-        model.load(chkpt)
-except:
-    model.fit(training, output, n_epoch=200, batch_size=8, show_metric=True)
+# Workaround für nicht funktionierendes try/catch
+if os.path.exists("model.tflearn.index"):
+    model.load("model.tflearn")
+else:
+    model.fit(training, output, n_epoch=250, batch_size=8, show_metric=True)
     model.save("model.tflearn")
-
-model.fit(training, output, n_epoch=200, batch_size=8, show_metric=True)
-model.save("model.tflearn")
 
 
 def bag_of_words(s, words):

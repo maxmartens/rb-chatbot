@@ -75,7 +75,20 @@
     },
     {
       "tag": "paid",
-      "patterns": ["I want to pay my", "Did i pay for my "],
+      "patterns": [
+        "I want to check the status of my payments",
+        "Did I pay for my semester?",
+        "Did I already pay for my semesterfee",
+        "Do I have to pay my semester fee?",
+        "Tell me if my payment arrived",
+        "I want to know about my payments",
+        "Let me know about my payments",
+        "Do I still have to pay my semester fee?",
+        "Do I have any open payments?",
+        "Did I pay for this semester?",
+        "I want to check my semesterfee",
+        "Can you tell me my semesterfee?"
+      ],
       "responses": ["Let me check."],
       "context": []
     },

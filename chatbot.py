@@ -27,9 +27,7 @@ nltk.download('punkt')
 if unix:
     from address_processor import AddressProcessor
 
-
 chatbotname = 'Bo'
-
 
 def chatbot_out(*vars):
     message = " ".join(list(vars))
@@ -161,6 +159,7 @@ except:
     with open("data.pickle", "wb") as f:
         pickle.dump((words, labels, training, output), f)
 
+
 tensorflow.compat.v1.reset_default_graph()
 
 input_layer_size = len(training[0])
@@ -198,9 +197,6 @@ def bag_of_words(s, words):
 
     return numpy.array(bag)
 
-
-# Erstellen der Datenbank als Mockup
-
 import pandas as pd
 import numpy as np
 
@@ -211,11 +207,12 @@ student_entries = np.array([
     ['7623451','Philipp','Nowak','Galenstr','5','Dortmund','44137','5678','3.0','6547','1.0','5556',1 ],
     ['7122456','Christian','Klassen','Bachfeld','6','Dortmund','44138','1234','4.0','1245','1.3','5556',0]], dtype=object)
 student_entries_df = pd.DataFrame(student_entries, columns = ['Matriculation_number','Name','Surname','road','house_number','city', 'postcode', 'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2','Passed_Exam2_Grade', 'Applied_Exam','SemesterFeePaid' ])
-print(student_entries_df)
+Logger.debug(1, 'Student entries data frame:', student_entries_df)
 
 courses = np.array([['1234', 'Physics'], ['5678', 'Economics'], ['1245', 'English'], ['6547', 'Mathematics1'], ['5556', 'Mathematics2'], ['4567', 'Object_Oriented_Programming'], ['1111', 'Parallel_Programming'], ['1112', 'Prolog_with_Applications'], ['1113', 'Compiler_Construction'], ['1114', 'Model_Driven_Software_Development']], dtype=object)
 courses_df = pd.DataFrame(courses, columns = ['ID_Subject', 'Subjects_Name'])
-print(courses_df)
+Logger.debug(1, 'Courses data frame:', courses_df)
+
 
 # Wichtige Tags noch weiterer Usecases hinzufügen:
 greeting = 'greeting'
@@ -243,9 +240,11 @@ need_matriculation = {
 }
 
 def chat():
-    # Wichtige Zahlen vorderfinieren als 0
     matr_no = 0
-    print("Start talking with the bot!")
+
+    chatbot_out('I am your personal assistant for all of your requests regarding your studies.')
+    chatbot_out('How can I help you?')
+
     while True:
         inp = input("You: ")
 
@@ -275,7 +274,7 @@ def chat():
             Logger.debug(1, 'Index of second largest value:', second_result_index)
             next_tag = labels[second_result_index]
             Logger.debug(1, 'Second tag:', next_tag)
-            if accuracy_map[next_tag] >= 0.5:
+            if accuracy_map[next_tag] >= 0.3:
                 tag = next_tag
                 Logger.debug(1, 'New tag is:', tag)
             else:
@@ -283,14 +282,10 @@ def chat():
                 chatbot_out('How can I help you?')
                 continue
 
-        # Wahrscheinlichkeit für den Tag ? print(model.score(results)) ab prozentzahl in tag
-
         Logger.debug(1, 'Need matriculation:', need_matriculation[tag])
         if need_matriculation[tag] and not matr_no:
             matr_no = check_for_matriculation_number(inp)
 
-        # Input auf vorgeschriebene Muster/Nummern untersuchen und diese Speichern.
-        # house_no, exam_no, citycode, matr_no = checkingNumbers(inp)
 
         # Greeting mit reinnehmen Intents
         if tag == greeting:

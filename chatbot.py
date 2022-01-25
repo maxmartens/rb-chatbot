@@ -426,7 +426,7 @@ def chat():
                 tries += 1
                 chatbot_out('Please enter your exam number.')
                 inp = user_in()
-                _, exam_no, _, _ = checkingNumbers(inp)
+                exam_no = check_exam_number(inp)
             if exam_no:
                 register_exam(matr_no, exam_no)
             else:
@@ -439,14 +439,15 @@ def chat():
                 tries += 1
                 chatbot_out('Please enter your exam number.')
                 inp = user_in()
-                _, exam_no, _, _ = checkingNumbers(inp)
+                exam_no = check_exam_number(inp)
             if exam_no:
                 deregister_exam(matr_no, exam_no)
             else:
                 chatbot_out('I could not recognize the exam ID.')
 
+
         elif tag == paid:
-            if checkPaid(matr_no) == True:
+            if check_paid(matr_no) == True:
                 chatbot_out('You dont have any open payments.')
             else:
                 chatbot_out('Your semester fee is not marked as paid right now.')
@@ -457,32 +458,22 @@ def chat():
 
 
 # Hilfunsfunktionen
-def checkingNumbers(inp):
-    house_no, exam_no, citycode, matr_no = 0, 0, 0, 0
+def check_exam_number(inp):
+    Logger.debug(1, 'Checking input for exam number:', inp)
+    exam_no = 0
     inp_token = nltk.word_tokenize(inp)
 
-    house_no_token = None
-
     for token in inp_token:
-        # Checken ob Matrikelnummer, PLZ oder Prüfungsnummer in intents
-
-        # Wenn Hausnummern dann ist token davor wsl -> Straße
-        # Wenn PLZ ist token danach wsl -> Stadt
         try:
             number = int(token)
             if (len(token) == 4):
                 exam_no = number
-                print('exam') # TODO: Debugging
-                print(exam_no)
-            if (len(token) == 7):
-                matr_no = number
-                print('matr')
-                print(matr_no)
-
+                Logger.debug(1, 'Found exam number:', exam_no)
         except:
+            Logger.debug(1, 'Exam number not found')
             pass
 
-    return house_no, exam_no, citycode, matr_no
+    return exam_no
 
 
 def register_exam(matr_no, exam_no):

@@ -425,7 +425,7 @@ def chat():
                 chatbot_out('I have no information about the subject.')
 
         elif tag == exam_reg:
-            exam_no = 0
+            exam_no = check_exam_number(inp)
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
@@ -434,11 +434,12 @@ def chat():
                 exam_no = check_exam_number(inp)
             if exam_no:
                 register_exam(matr_no, exam_no)
+                Logger.debug(1, 'Student entries after registration:', student_entries_df)
             else:
                 chatbot_out('I could not recognize the exam ID.')
 
         elif tag == exam_dereg:
-            exam_no = 0
+            exam_no = check_exam_number(inp)
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
@@ -447,6 +448,7 @@ def chat():
                 exam_no = check_exam_number(inp)
             if exam_no:
                 deregister_exam(matr_no, exam_no)
+                Logger.debug(1, 'Student entries after deregistration:', student_entries_df)
             else:
                 chatbot_out('I could not recognize the exam ID.')
 
@@ -475,9 +477,10 @@ def check_exam_number(inp):
                 exam_no = number
                 Logger.debug(1, 'Found exam number:', exam_no)
         except:
-            Logger.debug(1, 'Exam number not found')
             pass
 
+    if not exam_no:
+        Logger.debug(1, 'Exam number not found:', exam_no)
     return exam_no
 
 

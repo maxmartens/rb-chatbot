@@ -2,33 +2,87 @@
   "intents": [
     {
       "tag": "greeting",
-      "patterns": ["Hi there", "How are you", "Is anyone there?","Hey","Hola", "Hello", "Good day"],
-      "responses": ["Hello, thanks for asking", "Good to see you again", "Hi there, how can I help?"],
-      "context": [""]
+      "patterns": [
+        "Hi there",
+        "How are you",
+        "Is anyone there?",
+        "Hey",
+        "Hola",
+        "Hello",
+        "Good day"
+      ],
+      "responses": [
+        "Hello",
+        "Good to see you again",
+        "Hi there, how can I help?"
+      ],
+      "context": [
+        ""
+      ]
     },
     {
       "tag": "goodbye",
-      "patterns": ["Bye", "See you later", "Goodbye", "Nice chatting to you, bye", "Till next time"],
-      "responses": ["See you!", "Have a nice day", "Bye! Come back again soon."],
-      "context": [""]
+      "patterns": [
+        "Bye",
+        "See you later",
+        "Goodbye",
+        "Nice chatting to you, bye",
+        "Till next time"
+      ],
+      "responses": [
+        "See you!",
+        "Have a nice day",
+        "Bye! Come back again soon."
+      ],
+      "context": [
+        ""
+      ]
     },
     {
       "tag": "thanks",
-      "patterns": ["Thanks", "Thank you", "That's helpful", "Awesome, thanks", "Thanks for helping me"],
-      "responses": ["Happy to help!", "Any time!", "My pleasure"],
-      "context": [""]
+      "patterns": [
+        "Thanks",
+        "Thank you",
+        "That's helpful",
+        "Awesome, thanks",
+        "Thanks for helping me"
+      ],
+      "responses": [
+        "Happy to help!",
+        "Any time!",
+        "My pleasure"
+      ],
+      "context": [
+        ""
+      ]
     },
     {
       "tag": "noanswer",
       "patterns": [],
-      "responses": ["Sorry, can't understand you", "Please give me more info", "Not sure I understand"],
-      "context": [""]
+      "responses": [
+        "Sorry, can't understand you",
+        "Please give me more info",
+        "Not sure I understand"
+      ],
+      "context": [
+        ""
+      ]
     },
     {
       "tag": "options",
-      "patterns": ["How you could help me?", "What you can do?", "What help you provide?", "How you can be helpful?", "What support is offered"],
-      "responses": ["I can help you with everything around your Studies"],
-      "context": [""]
+      "patterns": [
+        "How you could help me?",
+        "What you can do?",
+        "What help you provide?",
+        "How you can be helpful?",
+        "What support is offered"
+      ],
+      "responses": [
+        "I can help you with everything around your Studies"
+      ],
+      "context": [
+        ""
+      ]
     },
     {
       "tag": "identification",
@@ -52,13 +106,24 @@
         "I have a new address",
         "I have a new home address"
       ],
-      "responses": ["Sure, what's your new address?", "Okay, please enter your address."],
+      "responses": [
+        "Sure, what's your new address?",
+        "Okay, please enter your address."
+      ],
       "context": []
     },
     {
       "tag": "change_name",
-      "patterns": ["I want to change my name", "I have married", "My new name is", "I have changed my name"],
-      "responses": ["Sure, what's your new surname?", "Okay, please enter your surname."],
+      "patterns": [
+        "I want to change my name",
+        "I have married",
+        "My new name is",
+        "I have changed my name"
+      ],
+      "responses": [
+        "Sure, what's your new surname?",
+        "Okay, please enter your surname."
+      ],
       "context": []
     },
     {
@@ -71,9 +136,15 @@
         "Register me",
         "Can you register me?",
         "Add another exam registration",
-        "Replace my exam registration"
+        "Replace my exam registration",
+        "I want to take the exam",
+        "Let me write the exam",
+        "I want to participate at"
       ],
-      "responses": ["Sure for which exam?", "Okay, please enter the name of the exam."],
+      "responses": [
+        "Sure for which exam?",
+        "Okay, please enter the name of the exam."
+      ],
       "context": []
     },
     {
@@ -85,27 +156,63 @@
         "Could I be deregistered?",
         "Deregister me",
         "Can you deregister me?",
-        "Delete my exam registration"
+        "Delete my exam registration",
+        "I want to cancel the exam"
       ],
-      "responses": ["Sure for which exam?", "Okay, please enter the name of the exam."],
+      "responses": [
+        "Sure for which exam?",
+        "Okay, please enter the name of the exam."
+      ],
       "context": []
     },
     {
       "tag": "paid",
-      "patterns": ["I want to pay my", "Did i pay for my "],
-      "responses": ["Let me check."],
+      "patterns": [
+        "I want to pay my",
+        "Did i pay for my ",
+        "I want to check the status of my payments",
+        "Did i pay for my semester?",
+        "Did i already pay for my semesterfee",
+        "Do i have to pay my semester fee?",
+        "Tell me if my payment arrived",
+        "I want to know about my payments",
+        "Let me know about my payments",
+        "Do i still have to pay my semster fee?",
+        "Do i have any open payments?",
+        "Did i pay for this semester?",
+        "I want to check my semesterfee",
+        "Can you tell me my semesterfee?"
+      ],
+      "responses": [
+        ""
+      ],
       "context": []
     },
     {
       "tag": "grade_examination",
-      "patterns": ["What is my grade ?", "Can you tell me how well did I preforme in one subject", "What is my note for one subject", "What grade did I get?"],
-      "responses": ["Sure, please enter the ID of the subject", "Can you tell me for which subject do you want to know your grade? "],
-      "context":[]
+      "patterns": [
+        "What is my grade ?",
+        "Can you tell me how well did I preform in one subject",
+        "What is my note for one subject",
+        "What grade did I get?"
+      ],
+      "responses": [
+        "Sure, please enter the ID of the subject",
+        "Can you tell me for which subject do you want to know your grade? "
+      ],
+      "context": []
     },
     {
       "tag": "status_examination_registration",
-      "patterns": ["I want to check the status of an exam", "Can you give me the status of the exam", "I want to prove the status of an exam"],
-      "responses": ["Sure, please enter the number of the asked subject ", "Please enter the ID of asked subject"],
+      "patterns": [
+        "I want to check the status of an exam",
+        "Can you give me the status of the exam",
+        "I want to prove the status of an exam"
+      ],
+      "responses": [
+        "Sure, please enter the number of the asked subject ",
+        "Please enter the ID of asked subject"
+      ],
       "context": []
     }
   ]

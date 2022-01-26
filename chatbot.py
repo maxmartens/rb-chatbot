@@ -29,6 +29,7 @@ if unix:
 
 chatbotname = 'Bo'
 
+
 def chatbot_out(*vars):
     message = " ".join(list(vars))
     print(f'{chatbotname}:', message)
@@ -180,7 +181,7 @@ model = tflearn.DNN(net, tensorboard_verbose=3)
 if os.path.exists("model.tflearn.index"):
     model.load("model.tflearn")
 else:
-    model.fit(training, output, n_epoch=250, batch_size=8, show_metric=True)
+    model.fit(training, output, n_epoch=600, batch_size=32, show_metric=True)
     model.save("model.tflearn")
 
 
@@ -235,6 +236,8 @@ exam_dereg = 'exam_dereg'
 paid = 'paid'
 grade_examination_tag = 'grade_examination'
 status_examination_registration_tag = 'status_examination_registration'
+thanks_tag = 'thanks'
+options_tag = 'options'
 
 need_matriculation = {
     greeting: False,
@@ -246,7 +249,9 @@ need_matriculation = {
     exam_dereg: True,
     paid: True,
     grade_examination_tag: True,
-    status_examination_registration_tag: True
+    status_examination_registration_tag: True,
+    thanks_tag: False,
+    options_tag: False
 }
 
 def chat():
@@ -458,6 +463,14 @@ def chat():
                 chatbot_out('You dont have any open payments.')
             else:
                 chatbot_out('Your semester fee is not marked as paid right now.')
+
+        elif tag == thanks_tag:
+            responses = data["intents"][2]["responses"]
+            chatbot_out(random.choice(responses))
+
+        elif tag == options_tag:
+            responses = data["intents"][3]["responses"]
+            chatbot_out(random.choice(responses))
 
         # Restliche Fälle vernünftiges Handling für schrott eingaben etc finden
         else:

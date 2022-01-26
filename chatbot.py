@@ -306,12 +306,12 @@ def chat():
 
         # Greeting mit reinnehmen Intents
         if tag == greeting:
-            responses = data["intents"][0]["responses"]
+            responses = data[data.intents == tag][responses]
             chatbot_out(random.choice(responses))
 
         # Wann soll Chatbot ausgeschaltet werden?
         elif tag == goodbye:
-            responses = data["intents"][1]["responses"]
+            responses = data[data.intents == tag][responses]
             chatbot_out(random.choice(responses))
             break
 
@@ -335,7 +335,8 @@ def chat():
                 retries = 0
                 if not retries and len(processor.empty_members) >= 4:
                     Logger.debug(1, 'Frist try and all members empty')
-                    chatbot_out('Okay, what is your new address?')
+                    responses = data[data.intents == tag][responses]
+                    chatbot_out(random.choice(responses))
                     inp = user_in()
                     inp = filter_input_by_stems(inp, activated)
                     Logger.debug(1, 'Filtered User Input:', inp)
@@ -385,13 +386,15 @@ def chat():
                 chatbot_out('Please switch to an UNIX-based OS and be awesome.')
 
         elif tag == change_name:
-            chatbot_out('Add your new surname.')
+            responses = data[data.intents == tag][responses]
+            chatbot_out(random.choice(responses))
             d = user_in()
             student_entries_df["Surname"] = numpy.where(student_entries_df["Matriculation_number"] == matr_no, d, student_entries_df["Surname"])
             chatbot_out('Your surname has been successfully uploaded.')
 
         elif tag == grade_examination_tag:
-            chatbot_out("Please enter the exam ID.")
+            responses = data[data.intents == tag][responses]
+            chatbot_out(random.choice(responses))
             b = user_in()
 
             ppp = sqldf(f"SELECT ID_Subject={b} FROM courses_df WHERE ID_Subject={b}")
@@ -412,10 +415,11 @@ def chat():
             elif (aaab != 0) & (aaa != 0) & (aa == 0):
                 chatbot_out("I am sorry the given subject hasn't been passed yet.")
             else:
-                chatbot_out("You entered a wrong number.")
+                chatbot_out("I am sorry. It looks like you entered a wrong number.")
 
         elif tag == status_examination_registration_tag:
-            chatbot_out('Please enter the exam ID.')
+            responses = data[data.intents == tag][responses]
+            chatbot_out(random.choice(responses))
             b = user_in()
             q = sqldf(f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={b} and Matriculation_number={matr_no}")
             qq = sqldf(f"SELECT Matriculation_number={matr_no} FROM student_entries_df WHERE Passed_Exam2={b} and Matriculation_number={matr_no}")
@@ -446,7 +450,8 @@ def chat():
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
-                chatbot_out('Please enter your exam number.')
+                responses = data[data.intents == tag][responses]
+                chatbot_out(random.choice(responses))
                 inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
             if exam_no:
@@ -459,7 +464,8 @@ def chat():
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
-                chatbot_out('Please enter your exam number.')
+                responses = data[data.intents == tag][responses]
+                chatbot_out(random.choice(responses))
                 inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
             if exam_no:
@@ -469,13 +475,16 @@ def chat():
 
         elif tag == paid:
             if checkPaid(matr_no) == True:
-                chatbot_out('You dont have any open payments.')
+                responses = ['You dont have any open payments.', 'You already paid your fee.']
+                chatbot_out(random.choice(responses))
             else:
-                chatbot_out('Your semester fee is not marked as paid right now.')
+                responses = ['Your semester fee is not marked as paid right now.', 'You still need to pay your fee.']
+                chatbot_out(random.choice(responses))
 
-        # Restliche Fälle vernünftiges Handling für schrott eingaben etc finden
+        # Restliche Fälle Chatbot fragt nach mehr Informationen.
         else:
-            chatbot_out('Sorry I did not understand that.')
+            responses = data[data.intents == tag][responses]
+            chatbot_out(random.choice(responses))
 
 
 # Hilfunsfunktionen
@@ -483,13 +492,7 @@ def checkingNumbers(inp):
     house_no, exam_no, citycode, matr_no = 0, 0, 0, 0
     inp_token = nltk.word_tokenize(inp)
 
-    house_no_token = None
-
     for token in inp_token:
-        # Checken ob Matrikelnummer, PLZ oder Prüfungsnummer in intents
-
-        # Wenn Hausnummern dann ist token davor wsl -> Straße
-        # Wenn PLZ ist token danach wsl -> Stadt
         try:
             number = int(token)
             if (len(token) == 4):
@@ -566,11 +569,6 @@ def change_address(matriculation_number, address):
 
     else:
         Logger.debug(1, 'No index found for:', matriculation_number)
-
-
-def changeName(matr_no, name, surname):
-    print(matr_no)
-
 
 def checkPaid(matr_no):
     return bool(int(student_entries_df[student_entries_df.Matriculation_number==matr_no].SemesterFeePaid))

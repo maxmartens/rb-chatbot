@@ -160,7 +160,7 @@ class AddressProcessor:
     def __match_city_by_string(self, string, text):
         string = string.replace('.', '')
         string = string.replace(' ', r'\b.?.?\b')
-        regex = fr'\b{string}\b'
+        regex = fr'\b{string}\b[)]?'
 
         Logger.debug(2, 'Match city by string (Regex):', regex)
         return re.search(regex, text, flags=re.IGNORECASE)

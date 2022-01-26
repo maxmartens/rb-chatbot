@@ -306,12 +306,12 @@ def chat():
 
         # Greeting mit reinnehmen Intents
         if tag == greeting:
-            responses = data[data.intents == tag][responses]
+            responses = data["intents"][0]["responses"]
             chatbot_out(random.choice(responses))
 
         # Wann soll Chatbot ausgeschaltet werden?
         elif tag == goodbye:
-            responses = data[data.intents == tag][responses]
+            responses = data["intents"][1]["responses"]
             chatbot_out(random.choice(responses))
             break
 
@@ -335,7 +335,7 @@ def chat():
                 retries = 0
                 if not retries and len(processor.empty_members) >= 4:
                     Logger.debug(1, 'Frist try and all members empty')
-                    responses = data[data.intents == tag][responses]
+                    responses = data["intents"][5]["responses"]
                     chatbot_out(random.choice(responses))
                     inp = user_in()
                     inp = filter_input_by_stems(inp, activated)
@@ -386,14 +386,14 @@ def chat():
                 chatbot_out('Please switch to an UNIX-based OS and be awesome.')
 
         elif tag == change_name:
-            responses = data[data.intents == tag][responses]
+            responses = data["intents"][6]["responses"]
             chatbot_out(random.choice(responses))
             d = user_in()
             student_entries_df["Surname"] = numpy.where(student_entries_df["Matriculation_number"] == matr_no, d, student_entries_df["Surname"])
             chatbot_out('Your surname has been successfully uploaded.')
 
         elif tag == grade_examination_tag:
-            responses = data[data.intents == tag][responses]
+            responses = data["intents"][10]["responses"]
             chatbot_out(random.choice(responses))
             b = user_in()
 
@@ -418,7 +418,7 @@ def chat():
                 chatbot_out("I am sorry. It looks like you entered a wrong number.")
 
         elif tag == status_examination_registration_tag:
-            responses = data[data.intents == tag][responses]
+            responses = data["intents"][11]["responses"]
             chatbot_out(random.choice(responses))
             b = user_in()
             q = sqldf(f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={b} and Matriculation_number={matr_no}")
@@ -450,7 +450,7 @@ def chat():
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
-                responses = data[data.intents == tag][responses]
+                responses = data["intents"][7]["responses"]
                 chatbot_out(random.choice(responses))
                 inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
@@ -464,7 +464,7 @@ def chat():
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
-                responses = data[data.intents == tag][responses]
+                responses = data["intents"][8]["responses"]
                 chatbot_out(random.choice(responses))
                 inp = user_in()
                 _, exam_no, _, _ = checkingNumbers(inp)
@@ -483,7 +483,7 @@ def chat():
 
         # Restliche Fälle Chatbot fragt nach mehr Informationen.
         else:
-            responses = data[data.intents == tag][responses]
+            responses = data["intents"][12]["responses"]
             chatbot_out(random.choice(responses))
 
 

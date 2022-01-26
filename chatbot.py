@@ -229,6 +229,7 @@ grade_examination_tag = 'grade_examination'
 status_examination_registration_tag = 'status_examination_registration'
 thanks_tag = 'thanks'
 options_tag = 'options'
+problem = 'problem'
 
 need_matriculation = {
     greeting: False,
@@ -242,7 +243,8 @@ need_matriculation = {
     grade_examination_tag: True,
     status_examination_registration_tag: True,
     thanks_tag: False,
-    options_tag: False
+    options_tag: False,
+    problem: False
 }
 
 def chat():

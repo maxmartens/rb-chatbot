@@ -12,8 +12,8 @@
         "Good day"
       ],
       "responses": [
-        "Hello",
-        "Good to see you again",
+        "Hello.",
+        "Good to see you again!",
         "Hi there, how can I help?"
         ]
     },
@@ -28,7 +28,7 @@
       ],
       "responses": [
         "See you!",
-        "Have a nice day",
+        "Have a nice day!",
         "Bye! Come back again soon."
       ]
     },
@@ -44,7 +44,7 @@
       "responses": [
         "Happy to help!",
         "Any time!",
-        "My pleasure"
+        "My pleasure!"
       ]
     },
     {
@@ -58,7 +58,7 @@
       ],
       "responses": [
         "I can help you with everything around your studies.",
-        "I can help you with different matters like checking a grade or changing your adress and even a lot more."
+        "I can help you with different matters like checking a grade or changing your address and with further issues."
       ]
     },
     {
@@ -70,8 +70,8 @@
         "My name is {} and my matriculation number is {}"
       ],
       "responses": [
-        "How can i help you?",
-        "Please let me know how i can help you."
+        "How can I help you?",
+        "Please let me know how I can help you."
       ]
     },
     {
@@ -86,7 +86,7 @@
         "I have a new home address"
       ],
       "responses": [
-        "Sure, what's your new address?",
+        "Sure, what is your new address?",
         "Okay, please enter your address."
       ]
     },
@@ -99,7 +99,7 @@
         "I have changed my name"
       ],
       "responses": [
-        "Sure, what's your new surname?",
+        "Sure, what is your new surname?",
         "Okay, please enter your surname.",
         "Alright. Just tell me your new surname."
       ]
@@ -120,7 +120,7 @@
         "I want to participate at"
       ],
       "responses": [
-        "Sure for which exam?",
+        "Sure, for which exam?",
         "Okay, please enter the number of the exam.",
         "I can register you for an exam. Let me know for which one."
       ]
@@ -138,7 +138,7 @@
         "I want to cancel the exam"
       ],
       "responses": [
-        "Sure for which exam?",
+        "Sure, for which exam?",
         "Okay, please enter the number of the exam.",
         "I can deregister you for an exam. Let me know for which one."
       ]
@@ -174,8 +174,8 @@
         "What grade did I get?"
       ],
       "responses": [
-        "Sure, please enter the ID of the subject",
-        "Can you tell me for which subject do you want to know your grade? "
+        "Sure, please enter the ID of the requested subject.",
+        "Can you tell me which subject you want to know the grade for? "
       ]
     },
     {
@@ -186,9 +186,9 @@
         "I want to prove the status of an exam"
       ],
       "responses": [
-        "Sure, please enter the number of the asked subject ",
-        "Please enter the ID of asked subject",
-        "I can cehck you grade. Just give me the number of the exam you want to check."
+        "Sure, please enter the number for the requested subject.",
+        "Please enter the ID for the requested subject.",
+        "I can check your grade. Just give me the number of the exam you want to check."
       ]
     },
     {
@@ -197,10 +197,10 @@
         ""
       ],
       "responses": [
-        "I am sorry i could not understand you.",
-        "I am not sure how i can help you with that.",
-        "Sorry. I didnt understand that. Please try again",
-        "My bad i did not catch that. Please give me more information."
+        "I am sorry I could not understand you.",
+        "I am not sure how can I help you with that.",
+        "Sorry. I did not understand that. Please try again",
+        "My bad I did not get that. Please give me more information."
       ]
     }
   ]

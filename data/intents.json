@@ -15,10 +15,7 @@
         "Hello",
         "Good to see you again",
         "Hi there, how can I help?"
-      ],
-      "context": [
-        ""
-      ]
+        ]
     },
     {
       "tag": "goodbye",
@@ -33,9 +30,6 @@
         "See you!",
         "Have a nice day",
         "Bye! Come back again soon."
-      ],
-      "context": [
-        ""
       ]
     },
     {
@@ -51,21 +45,6 @@
         "Happy to help!",
         "Any time!",
         "My pleasure"
-      ],
-      "context": [
-        ""
-      ]
-    },
-    {
-      "tag": "noanswer",
-      "patterns": [],
-      "responses": [
-        "Sorry, can't understand you",
-        "Please give me more info",
-        "Not sure I understand"
-      ],
-      "context": [
-        ""
       ]
     },
     {
@@ -78,10 +57,8 @@
         "What support is offered"
       ],
       "responses": [
-        "I can help you with everything around your Studies"
-      ],
-      "context": [
-        ""
+        "I can help you with everything around your studies.",
+        "I can help you with different matters like checking a grade or changing your adress and even a lot more."
       ]
     },
     {
@@ -92,8 +69,10 @@
         "My mat no is {}",
         "My name is {} and my matriculation number is {}"
       ],
-      "responses": [],
-      "context": []
+      "responses": [
+        "How can i help you?",
+        "Please let me know how i can help you."
+      ]
     },
     {
       "tag": "change_address",
@@ -109,8 +88,7 @@
       "responses": [
         "Sure, what's your new address?",
         "Okay, please enter your address."
-      ],
-      "context": []
+      ]
     },
     {
       "tag": "change_name",
@@ -122,9 +100,9 @@
       ],
       "responses": [
         "Sure, what's your new surname?",
-        "Okay, please enter your surname."
-      ],
-      "context": []
+        "Okay, please enter your surname.",
+        "Alright. Just tell me your new surname."
+      ]
     },
     {
       "tag": "exam_reg",
@@ -143,9 +121,9 @@
       ],
       "responses": [
         "Sure for which exam?",
-        "Okay, please enter the name of the exam."
-      ],
-      "context": []
+        "Okay, please enter the number of the exam.",
+        "I can register you for an exam. Let me know for which one."
+      ]
     },
     {
       "tag": "exam_dereg",
@@ -161,9 +139,9 @@
       ],
       "responses": [
         "Sure for which exam?",
-        "Okay, please enter the name of the exam."
-      ],
-      "context": []
+        "Okay, please enter the name of the exam.",
+        "I can deregister you for an exam. Let me know for which one."
+      ]
     },
     {
       "tag": "paid",
@@ -185,8 +163,7 @@
       ],
       "responses": [
         ""
-      ],
-      "context": []
+      ]
     },
     {
       "tag": "grade_examination",
@@ -199,8 +176,7 @@
       "responses": [
         "Sure, please enter the ID of the subject",
         "Can you tell me for which subject do you want to know your grade? "
-      ],
-      "context": []
+      ]
     },
     {
       "tag": "status_examination_registration",
@@ -211,9 +187,21 @@
       ],
       "responses": [
         "Sure, please enter the number of the asked subject ",
-        "Please enter the ID of asked subject"
+        "Please enter the ID of asked subject",
+        "I can cehck you grade. Just give me the number of the exam you want to check."
+      ]
+    },
+    {
+      "tag": "problem",
+      "patterns": [
+        ""
       ],
-      "context": []
+      "responses": [
+        "I am sorry i could not understand you.",
+        "I am not sure how i can help you with that.",
+        "Sorry. I didnt understand that. Please try again",
+        "My bad i did not catch that. Please give me more information."
+      ]
     }
   ]
 }

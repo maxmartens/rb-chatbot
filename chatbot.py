@@ -1,4 +1,3 @@
-import os.path
 from sys import platform
 
 unix = "darwin" in platform or "linux" in platform
@@ -330,7 +329,8 @@ def chat():
                 retries = 0
                 if not retries and len(processor.empty_members) >= 4:
                     Logger.debug(1, 'Frist try and all members empty')
-                    chatbot_out('Okay, what is your new address?')
+                    responses = data["intents"][5]["responses"]
+                    chatbot_out(random.choice(responses))
                     inp = user_in()
                     inp = filter_input_by_stems(inp, activated)
                     Logger.debug(1, 'Filtered User Input:', inp)
@@ -381,7 +381,8 @@ def chat():
 
 
         elif tag == change_name:
-            chatbot_out('Add your new surname.')
+            responses = data["intents"][6]["responses"]
+            chatbot_out(random.choice(responses))
             d = user_in()
             student_entries_df["Surname"] = numpy.where(student_entries_df["Matriculation_number"] == matr_no, d, student_entries_df["Surname"])
             chatbot_out('Your surname has been successfully updated.')
@@ -390,6 +391,8 @@ def chat():
         elif tag == grade_examination_tag:
             chatbot_out("Please enter the exam ID.")
             user_input = user_in()
+            responses = data["intents"][10]["responses"]
+            chatbot_out(random.choice(responses))
 
             exam_exists = sqldf(f"SELECT ID_Subject={user_input} FROM courses_df WHERE ID_Subject={user_input}")
             passed_exam1_grade = sqldf(f"SELECT Passed_Exam1_Grade FROM student_entries_df WHERE Passed_Exam1={user_input} and Matriculation_number={matr_no}")
@@ -402,11 +405,12 @@ def chat():
             elif (passed_exam1_grade.empty != 0) & (passed_exam2_grade.empty != 0) & (exam_exists.empty == 0):
                 chatbot_out("I am sorry the given subject hasn't been passed yet.")
             else:
-                chatbot_out("You entered a wrong number.")
+                chatbot_out("I am sorry. It looks like you entered a wrong number.")
 
 
         elif tag == status_examination_registration_tag:
-            chatbot_out('Please enter the exam ID.')
+            responses = data["intents"][11]["responses"]
+            chatbot_out(random.choice(responses))
             user_input = user_in()
             passed_as_exam1 = sqldf(f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={user_input} and Matriculation_number={matr_no}")
             passed_ad_exam2 = sqldf(f"SELECT Matriculation_number={matr_no} FROM student_entries_df WHERE Passed_Exam2={user_input} and Matriculation_number={matr_no}")
@@ -429,7 +433,8 @@ def chat():
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
-                chatbot_out('Please enter your exam number.')
+                responses = data["intents"][7]["responses"]
+                chatbot_out(random.choice(responses))
                 inp = user_in()
                 exam_no = check_exam_number(inp)
             if exam_no:
@@ -443,7 +448,8 @@ def chat():
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
-                chatbot_out('Please enter your exam number.')
+                responses = data["intents"][8]["responses"]
+                chatbot_out(random.choice(responses))
                 inp = user_in()
                 exam_no = check_exam_number(inp)
             if exam_no:
@@ -455,13 +461,16 @@ def chat():
 
         elif tag == paid:
             if check_paid(matr_no) == True:
-                chatbot_out('You dont have any open payments.')
+                responses = ['You dont have any open payments.', 'You already paid your fee.']
+                chatbot_out(random.choice(responses))
             else:
-                chatbot_out('Your semester fee is not marked as paid right now.')
+                responses = ['Your semester fee is not marked as paid right now.', 'You still need to pay your fee.']
+                chatbot_out(random.choice(responses))
 
-        # Restliche Fälle vernünftiges Handling für schrott eingaben etc finden
+        # Restliche Fälle Chatbot fragt nach mehr Informationen.
         else:
-            chatbot_out('Sorry I did not understand that.')
+            responses = data["intents"][12]["responses"]
+            chatbot_out(random.choice(responses))
 
 
 # Hilfunsfunktionen

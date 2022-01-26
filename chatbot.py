@@ -1,3 +1,4 @@
+import os.path
 from sys import platform
 
 unix = "darwin" in platform or "linux" in platform
@@ -26,9 +27,7 @@ nltk.download('punkt')
 if unix:
     from address_processor import AddressProcessor
 
-
 chatbotname = 'Bo'
-
 
 def chatbot_out(*vars):
     message = " ".join(list(vars))
@@ -160,6 +159,7 @@ except:
     with open("data.pickle", "wb") as f:
         pickle.dump((words, labels, training, output), f)
 
+
 tensorflow.compat.v1.reset_default_graph()
 
 input_layer_size = len(training[0])
@@ -176,15 +176,12 @@ net = tflearn.regression(output_layer, metric=tflearn.metrics.Accuracy(), optimi
 
 model = tflearn.DNN(net, tensorboard_verbose=3)
 
-try:
-    with open("model.tflearn") as chkpt:
-        model.load(chkpt)
-except:
-    model.fit(training, output, n_epoch=200, batch_size=8, show_metric=True)
+# Workaround für nicht funktionierendes try/catch
+if os.path.exists("model.tflearn.index"):
+    model.load("model.tflearn")
+else:
+    model.fit(training, output, n_epoch=250, batch_size=8, show_metric=True)
     model.save("model.tflearn")
-
-model.fit(training, output, n_epoch=200, batch_size=8, show_metric=True)
-model.save("model.tflearn")
 
 
 def bag_of_words(s, words):
@@ -200,9 +197,6 @@ def bag_of_words(s, words):
 
     return numpy.array(bag)
 
-
-# Erstellen der Datenbank als Mockup
-
 import pandas as pd
 import numpy as np
 
@@ -213,7 +207,7 @@ student_entries = np.array([
     ['7623451','Philipp','Nowak','Galenstr','5','Dortmund','44137','5678','3.0','6547','1.0','5556',1 ],
     ['7122456','Christian','Klassen','Bachfeld','6','Dortmund','44138','1234','4.0','1245','1.3','5556',0]], dtype=object)
 student_entries_df = pd.DataFrame(student_entries, columns = ['Matriculation_number','Name','Surname','road','house_number','city', 'postcode', 'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2','Passed_Exam2_Grade', 'Applied_Exam','SemesterFeePaid' ])
-print(student_entries_df)
+Logger.debug(1, 'Student entries data frame:', student_entries_df)
 
 courses = np.array([
     ['1234', 'Physics'],
@@ -227,7 +221,8 @@ courses = np.array([
     ['1113', 'Compiler_Construction'],
     ['1114', 'Model_Driven_Software_Development']], dtype=object)
 courses_df = pd.DataFrame(courses, columns = ['ID_Subject', 'Subjects_Name'])
-print(courses_df)
+Logger.debug(1, 'Courses data frame:', courses_df)
+
 
 # Wichtige Tags noch weiterer Usecases hinzufügen:
 greeting = 'greeting'
@@ -255,9 +250,11 @@ need_matriculation = {
 }
 
 def chat():
-    # Wichtige Zahlen vorderfinieren als 0
     matr_no = 0
-    print("Start talking with the bot!")
+
+    chatbot_out('I am your personal assistant for all of your requests regarding your studies.')
+    chatbot_out('How can I help you?')
+
     while True:
         inp = input("You: ")
 
@@ -287,7 +284,7 @@ def chat():
             Logger.debug(1, 'Index of second largest value:', second_result_index)
             next_tag = labels[second_result_index]
             Logger.debug(1, 'Second tag:', next_tag)
-            if accuracy_map[next_tag] >= 0.5:
+            if accuracy_map[next_tag] >= 0.3:
                 tag = next_tag
                 Logger.debug(1, 'New tag is:', tag)
             else:
@@ -295,25 +292,23 @@ def chat():
                 chatbot_out('How can I help you?')
                 continue
 
-        # Wahrscheinlichkeit für den Tag ? print(model.score(results)) ab prozentzahl in tag
-
         Logger.debug(1, 'Need matriculation:', need_matriculation[tag])
         if need_matriculation[tag] and not matr_no:
             matr_no = check_for_matriculation_number(inp)
 
-        # Input auf vorgeschriebene Muster/Nummern untersuchen und diese Speichern.
-        # house_no, exam_no, citycode, matr_no = checkingNumbers(inp)
 
         # Greeting mit reinnehmen Intents
         if tag == greeting:
             responses = data["intents"][0]["responses"]
             chatbot_out(random.choice(responses))
 
+
         # Wann soll Chatbot ausgeschaltet werden?
         elif tag == goodbye:
             responses = data["intents"][1]["responses"]
             chatbot_out(random.choice(responses))
             break
+
 
         # Behandlung Use Case Umzug
         elif tag == change_address_tag:
@@ -384,91 +379,82 @@ def chat():
                 chatbot_out('Seems like you are using an inferior operating system.')
                 chatbot_out('Please switch to an UNIX-based OS and be awesome.')
 
+
         elif tag == change_name:
             chatbot_out('Add your new surname.')
             d = user_in()
             student_entries_df["Surname"] = numpy.where(student_entries_df["Matriculation_number"] == matr_no, d, student_entries_df["Surname"])
-            chatbot_out('Your surname has been successfully uploaded.')
+            chatbot_out('Your surname has been successfully updated.')
+
 
         elif tag == grade_examination_tag:
             chatbot_out("Please enter the exam ID.")
-            b = user_in()
+            user_input = user_in()
 
-            ppp = sqldf(f"SELECT ID_Subject={b} FROM courses_df WHERE ID_Subject={b}")
-            p = sqldf(f"SELECT Passed_Exam1_Grade FROM student_entries_df WHERE Passed_Exam1={b} and Matriculation_number={matr_no}")
-            pp = sqldf(f"SELECT Passed_Exam2_Grade FROM student_entries_df WHERE Passed_Exam2={b} and Matriculation_number={matr_no}")
+            exam_exists = sqldf(f"SELECT ID_Subject={user_input} FROM courses_df WHERE ID_Subject={user_input}")
+            passed_exam1_grade = sqldf(f"SELECT Passed_Exam1_Grade FROM student_entries_df WHERE Passed_Exam1={user_input} and Matriculation_number={matr_no}")
+            passed_exam2_grade = sqldf(f"SELECT Passed_Exam2_Grade FROM student_entries_df WHERE Passed_Exam2={user_input} and Matriculation_number={matr_no}")
 
-            leer = p.empty
-            lee = pp.empty
-            le = ppp.empty
-            aaab = leer
-            aaa = lee
-            aa = le
-
-            if (aaab == 0) & (aaa != 0) & (aa == 0):
-                chatbot_out("Your Grade for the entered Exam is", p.iat[0, 0])
-            elif (aaab != 0) & (aaa == 0) & (aa == 0):
-                chatbot_out("Your Grade for the entered Exam is", pp.iat[0, 0])
-            elif (aaab != 0) & (aaa != 0) & (aa == 0):
+            if (passed_exam1_grade.empty == 0) & (passed_exam2_grade.empty != 0) & (exam_exists.empty == 0):
+                chatbot_out("Your Grade for the entered Exam is", passed_exam1_grade.iat[0, 0])
+            elif (passed_exam1_grade.empty != 0) & (passed_exam2_grade.empty == 0) & (exam_exists.empty == 0):
+                chatbot_out("Your Grade for the entered Exam is", passed_exam2_grade.iat[0, 0])
+            elif (passed_exam1_grade.empty != 0) & (passed_exam2_grade.empty != 0) & (exam_exists.empty == 0):
                 chatbot_out("I am sorry the given subject hasn't been passed yet.")
             else:
                 chatbot_out("You entered a wrong number.")
 
+
         elif tag == status_examination_registration_tag:
             chatbot_out('Please enter the exam ID.')
-            b = user_in()
-            q = sqldf(f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={b} and Matriculation_number={matr_no}")
-            qq = sqldf(f"SELECT Matriculation_number={matr_no} FROM student_entries_df WHERE Passed_Exam2={b} and Matriculation_number={matr_no}")
-            qqq = sqldf(f"SELECT Applied_Exam FROM student_entries_df WHERE Applied_Exam={b} and Matriculation_number={matr_no}")
-            qqqq = sqldf(f"SELECT ID_Subject FROM courses_df WHERE ID_Subject={b}")
+            user_input = user_in()
+            passed_as_exam1 = sqldf(f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={user_input} and Matriculation_number={matr_no}")
+            passed_ad_exam2 = sqldf(f"SELECT Matriculation_number={matr_no} FROM student_entries_df WHERE Passed_Exam2={user_input} and Matriculation_number={matr_no}")
+            applied_exam = sqldf(f"SELECT Applied_Exam FROM student_entries_df WHERE Applied_Exam={user_input} and Matriculation_number={matr_no}")
+            exam_exists = sqldf(f"SELECT ID_Subject FROM courses_df WHERE ID_Subject={user_input}")
 
-            isempty = q.empty
-            isempt = qq.empty
-            isemp = qqq.empty
-            isem = qqqq.empty
-            ter = isempty
-            te = isempt
-            tee = isemp
-            teee = isem
-            if (ter == 0) & (te != 0) & (tee != 0) & (teee == 0):
+            if (passed_as_exam1.empty == 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty != 0) & (exam_exists.empty == 0):
                 chatbot_out("You already completed the Exam.")
-            elif (ter != 0) & (te == 0) & (tee != 0) & (teee == 0):
+            elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty == 0) & (applied_exam.empty != 0) & (exam_exists.empty == 0):
                 chatbot_out("You already completed the Exam.")
-            elif (ter != 0) & (te != 0) & (tee == 0) & (teee == 0):
+            elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty == 0) & (exam_exists.empty == 0):
                 chatbot_out("The exam was applied.")
-            elif (ter != 0) & (te != 0) & (tee != 0) & (teee == 0):
+            elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty != 0) & (exam_exists.empty == 0):
                 chatbot_out("You haven't registered for the exam yet.")
             else:
                 chatbot_out('I have no information about the subject.')
 
         elif tag == exam_reg:
-            exam_no = 0
+            exam_no = check_exam_number(inp)
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
                 chatbot_out('Please enter your exam number.')
                 inp = user_in()
-                _, exam_no, _, _ = checkingNumbers(inp)
+                exam_no = check_exam_number(inp)
             if exam_no:
                 register_exam(matr_no, exam_no)
+                Logger.debug(1, 'Student entries after registration:', student_entries_df)
             else:
                 chatbot_out('I could not recognize the exam ID.')
 
         elif tag == exam_dereg:
-            exam_no = 0
+            exam_no = check_exam_number(inp)
             tries = 0
             while exam_no == 0 and tries < 3:
                 tries += 1
                 chatbot_out('Please enter your exam number.')
                 inp = user_in()
-                _, exam_no, _, _ = checkingNumbers(inp)
+                exam_no = check_exam_number(inp)
             if exam_no:
                 deregister_exam(matr_no, exam_no)
+                Logger.debug(1, 'Student entries after deregistration:', student_entries_df)
             else:
                 chatbot_out('I could not recognize the exam ID.')
 
+
         elif tag == paid:
-            if checkPaid(matr_no) == True:
+            if check_paid(matr_no) == True:
                 chatbot_out('You dont have any open payments.')
             else:
                 chatbot_out('Your semester fee is not marked as paid right now.')
@@ -479,77 +465,66 @@ def chat():
 
 
 # Hilfunsfunktionen
-def checkingNumbers(inp):
-    house_no, exam_no, citycode, matr_no = 0, 0, 0, 0
+def check_exam_number(inp):
+    Logger.debug(1, 'Checking input for exam number:', inp)
+    exam_no = 0
     inp_token = nltk.word_tokenize(inp)
 
-    house_no_token = None
-
     for token in inp_token:
-        # Checken ob Matrikelnummer, PLZ oder Prüfungsnummer in intents
-
-        # Wenn Hausnummern dann ist token davor wsl -> Straße
-        # Wenn PLZ ist token danach wsl -> Stadt
         try:
             number = int(token)
             if (len(token) == 4):
                 exam_no = number
-                print('exam') # TODO: Debugging
-                print(exam_no)
-            if (len(token) == 7):
-                matr_no = number
-                print('matr')
-                print(matr_no)
-
+                Logger.debug(1, 'Found exam number:', exam_no)
         except:
             pass
 
-    return house_no, exam_no, citycode, matr_no
+    if not exam_no:
+        Logger.debug(1, 'Exam number not found:', exam_no)
+    return exam_no
 
 
 def register_exam(matr_no, exam_no):
     matriculation_numbers = student_entries_df['Matriculation_number'].values
     subjects = courses_df['ID_Subject'].values
 
-    if str(matr_no) in matriculation_numbers and str(exam_no) in subjects:
+    if str(exam_no) in subjects:
         student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
         student_row = student_entries_df.iloc[student_row_index]
         registered_exam = student_row['Applied_Exam']
 
         if str(exam_no) == str(registered_exam):
-            print('no update: subject_id already exists in registered exam')
+            chatbot_out(f'You are already registered for this exam ({exam_no}).')
 
         elif str(exam_no) in student_row.values:
-            print('no update: subject_id already exists in written exams')
+            chatbot_out(f'You have already completed this exam ({exam_no}).')
 
         else:
-            print('update: register for exam')
             student_entries_df.loc[student_row_index, 'Applied_Exam'] = str(exam_no)
+            chatbot_out(f'You were successfully registered for the exam ({exam_no}).')
 
-        print(student_entries_df)
     else:
-        print('Invalid matriculation number or exam number, please check again')
+        chatbot_out(f'Excuse me, I could not find this exam ({exam_no}).')
 
 
-def deregister_exam(matr_no , exam_no):
+def deregister_exam(matr_no, exam_no):
     matriculation_numbers = student_entries_df['Matriculation_number'].values
     applied_exams = student_entries_df['Applied_Exam'].values
 
-    if str(matr_no) in matriculation_numbers and str(exam_no) in applied_exams:
+    if str(exam_no) in applied_exams:
         student_row_index = numpy.where(matriculation_numbers == str(matr_no))[0]
         student_row = student_entries_df.iloc[student_row_index]
-        registered_exam = student_row['Applied_Exam'][1]
+        registered_exam = student_row['Applied_Exam'][0]
 
         if str(exam_no) == str(registered_exam):
-            print('update: deregister from exam')
             student_entries_df.loc[student_row_index, 'Applied_Exam'] = str(0)
+            chatbot_out(f'You were successfully deregistered from the exam ({exam_no}).')
 
         else:
-            print('no update: you are not registered for the given exam_no: ' + str(exam_no))
+            chatbot_out(f'You are not registered for this exam ({exam_no}).')
 
-        print(student_entries_df)
     else:
-        print('Invalid matriculation number or exam number, please check again')
+        chatbot_out(f'Excuse me, I could not find this exam ({exam_no}).')
 
 
 def change_address(matriculation_number, address):
@@ -568,11 +543,7 @@ def change_address(matriculation_number, address):
         Logger.debug(1, 'No index found for:', matriculation_number)
 
 
-def changeName(matr_no, name, surname):
-    print(matr_no)
-
-
-def checkPaid(matr_no):
+def check_paid(matr_no):
     return bool(int(student_entries_df[student_entries_df.Matriculation_number==matr_no].SemesterFeePaid))
 
 

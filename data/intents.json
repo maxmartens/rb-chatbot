@@ -99,7 +99,7 @@
     {
       "tag": "grade_examination",
       "patterns": ["What is my grade ?", "Can you tell me how well did I preforme in one subject", "What is my note for one subject", "What grade did I get?"],
-      "responses": ["Sure, please enter the ID of the subject", "Can you tell me for witch subject do you want to know your grade"],
+      "responses": ["Sure, please enter the ID of the subject", "Can you tell me for which subject do you want to know your grade? "],
       "context":[]
     },
     {

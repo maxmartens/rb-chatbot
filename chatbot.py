@@ -174,7 +174,7 @@ model = tflearn.DNN(net, tensorboard_verbose=3)
 if os.path.exists("model.tflearn.index"):
     model.load("model.tflearn")
 else:
-    model.fit(training, output, n_epoch=600, batch_size=32, show_metric=True)
+    model.fit(training, output, n_epoch=500, batch_size=32, show_metric=True)
     model.save("model.tflearn")
 
 
@@ -388,44 +388,69 @@ def chat():
 
 
         elif tag == grade_examination_tag:
-            chatbot_out("Please enter the exam ID.")
-            user_input = user_in()
-            responses = data["intents"][10]["responses"]
-            chatbot_out(random.choice(responses))
+            exam_no = check_exam_number(inp)
+            tries = 0
+            while exam_no == 0 and tries < 3:
+                tries += 1
+                responses = data["intents"][10]["responses"]
+                chatbot_out(random.choice(responses))
+                inp = user_in()
+                exam_no = check_exam_number(inp)
+            if exam_no:
+                exam_exists = sqldf(f"SELECT ID_Subject={exam_no} FROM courses_df WHERE ID_Subject={exam_no}")
+                passed_exam1_grade = sqldf(
+                    f"SELECT Passed_Exam1_Grade FROM student_entries_df WHERE Passed_Exam1={exam_no} and Matriculation_number={matr_no}")
+                passed_exam2_grade = sqldf(
+                    f"SELECT Passed_Exam2_Grade FROM student_entries_df WHERE Passed_Exam2={exam_no} and Matriculation_number={matr_no}")
 
-            exam_exists = sqldf(f"SELECT ID_Subject={user_input} FROM courses_df WHERE ID_Subject={user_input}")
-            passed_exam1_grade = sqldf(f"SELECT Passed_Exam1_Grade FROM student_entries_df WHERE Passed_Exam1={user_input} and Matriculation_number={matr_no}")
-            passed_exam2_grade = sqldf(f"SELECT Passed_Exam2_Grade FROM student_entries_df WHERE Passed_Exam2={user_input} and Matriculation_number={matr_no}")
-
-            if (passed_exam1_grade.empty == 0) & (passed_exam2_grade.empty != 0) & (exam_exists.empty == 0):
-                chatbot_out("Your Grade for the entered Exam is", passed_exam1_grade.iat[0, 0])
-            elif (passed_exam1_grade.empty != 0) & (passed_exam2_grade.empty == 0) & (exam_exists.empty == 0):
-                chatbot_out("Your Grade for the entered Exam is", passed_exam2_grade.iat[0, 0])
-            elif (passed_exam1_grade.empty != 0) & (passed_exam2_grade.empty != 0) & (exam_exists.empty == 0):
-                chatbot_out("I am sorry the given subject hasn't been passed yet.")
+                if (passed_exam1_grade.empty == 0) & (passed_exam2_grade.empty != 0) & (exam_exists.empty == 0):
+                    chatbot_out("Your Grade for the entered Exam is", passed_exam1_grade.iat[0, 0])
+                elif (passed_exam1_grade.empty != 0) & (passed_exam2_grade.empty == 0) & (exam_exists.empty == 0):
+                    chatbot_out("Your Grade for the entered Exam is", passed_exam2_grade.iat[0, 0])
+                elif (passed_exam1_grade.empty != 0) & (passed_exam2_grade.empty != 0) & (exam_exists.empty == 0):
+                    chatbot_out("I am sorry the given subject hasn't been passed yet.")
+                else:
+                    chatbot_out("I am sorry. It looks like you entered a wrong number.")
             else:
-                chatbot_out("I am sorry. It looks like you entered a wrong number.")
+                chatbot_out('I could not recognize the exam ID.')
 
 
         elif tag == status_examination_registration_tag:
-            responses = data["intents"][11]["responses"]
-            chatbot_out(random.choice(responses))
-            user_input = user_in()
-            passed_as_exam1 = sqldf(f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={user_input} and Matriculation_number={matr_no}")
-            passed_ad_exam2 = sqldf(f"SELECT Matriculation_number={matr_no} FROM student_entries_df WHERE Passed_Exam2={user_input} and Matriculation_number={matr_no}")
-            applied_exam = sqldf(f"SELECT Applied_Exam FROM student_entries_df WHERE Applied_Exam={user_input} and Matriculation_number={matr_no}")
-            exam_exists = sqldf(f"SELECT ID_Subject FROM courses_df WHERE ID_Subject={user_input}")
+            exam_no = check_exam_number(inp)
+            tries = 0
+            while exam_no == 0 and tries < 3:
+                tries += 1
+                responses = data["intents"][11]["responses"]
+                chatbot_out(random.choice(responses))
+                inp = user_in()
+                exam_no = check_exam_number(inp)
 
-            if (passed_as_exam1.empty == 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty != 0) & (exam_exists.empty == 0):
-                chatbot_out("You already completed the Exam.")
-            elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty == 0) & (applied_exam.empty != 0) & (exam_exists.empty == 0):
-                chatbot_out("You already completed the Exam.")
-            elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty == 0) & (exam_exists.empty == 0):
-                chatbot_out("The exam was applied.")
-            elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty != 0) & (exam_exists.empty == 0):
-                chatbot_out("You haven't registered for the exam yet.")
+            if exam_no:
+                passed_as_exam1 = sqldf(
+                    f"SELECT Matriculation_number={matr_no}  FROM student_entries_df WHERE Passed_Exam1={exam_no} and Matriculation_number={matr_no}")
+                passed_ad_exam2 = sqldf(
+                    f"SELECT Matriculation_number={matr_no} FROM student_entries_df WHERE Passed_Exam2={exam_no} and Matriculation_number={matr_no}")
+                applied_exam = sqldf(
+                    f"SELECT Applied_Exam FROM student_entries_df WHERE Applied_Exam={exam_no} and Matriculation_number={matr_no}")
+                exam_exists = sqldf(f"SELECT ID_Subject FROM courses_df WHERE ID_Subject={exam_no}")
+
+                if (passed_as_exam1.empty == 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty != 0) & (
+                        exam_exists.empty == 0):
+                    chatbot_out("You already completed the Exam.")
+                elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty == 0) & (applied_exam.empty != 0) & (
+                        exam_exists.empty == 0):
+                    chatbot_out("You already completed the Exam.")
+                elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty == 0) & (
+                        exam_exists.empty == 0):
+                    chatbot_out("The exam was applied.")
+                elif (passed_as_exam1.empty != 0) & (passed_ad_exam2.empty != 0) & (applied_exam.empty != 0) & (
+                        exam_exists.empty == 0):
+                    chatbot_out("You haven't registered for the exam yet.")
+                else:
+                    chatbot_out('I have no information about the subject.')
             else:
-                chatbot_out('I have no information about the subject.')
+                chatbot_out('I could not recognize the exam ID.')
+
 
         elif tag == exam_reg:
             exam_no = check_exam_number(inp)

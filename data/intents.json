@@ -139,7 +139,7 @@
       ],
       "responses": [
         "Sure for which exam?",
-        "Okay, please enter the name of the exam.",
+        "Okay, please enter the number of the exam.",
         "I can deregister you for an exam. Let me know for which one."
       ]
     },

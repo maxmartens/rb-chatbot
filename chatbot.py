@@ -1,16 +1,8 @@
+import os
 from sys import platform
-
-unix = "darwin" in platform or "linux" in platform
-
 from logger import Logger
-
-Logger(level=2, debug_mode=False)
-
 import nltk
 from nltk.stem.lancaster import LancasterStemmer
-
-stemmer = LancasterStemmer()
-
 import numpy
 import tflearn
 import tensorflow
@@ -18,15 +10,18 @@ import random
 import json
 import pickle
 from pandasql import sqldf
-
+import pandas as pd
 import re
 
+unix = "darwin" in platform or "linux" in platform
+Logger(level=2, debug_mode=False)
+stemmer = LancasterStemmer()
 nltk.download('punkt')
+chatbotname = 'Bo'
 
 if unix:
     from address_processor import AddressProcessor
 
-chatbotname = 'Bo'
 
 def chatbot_out(*vars):
     message = " ".join(list(vars))
@@ -196,10 +191,8 @@ def bag_of_words(s, words):
 
     return numpy.array(bag)
 
-import pandas as pd
-import numpy as np
 
-student_entries = np.array([
+student_entries = numpy.array([
     ['7234562','Anna','Mueller','Marienstr.', '12','Duesseldorf','56789','1234','1.3','1245','2.3','5556',1],
     ['7166521','Markus','Shmidt','Volklingerstr.','5','Koeln','50667','5678','1.3','6547','2.0','4567',0],
     ['7345673','Maria','Xi','Feldweg','2','Duesseldorf','40210','1234','1,7','1245','2.0','4567',1],
@@ -208,7 +201,7 @@ student_entries = np.array([
 student_entries_df = pd.DataFrame(student_entries, columns = ['Matriculation_number','Name','Surname','road','house_number','city', 'postcode', 'Passed_Exam1', 'Passed_Exam1_Grade', 'Passed_Exam2','Passed_Exam2_Grade', 'Applied_Exam','SemesterFeePaid' ])
 Logger.debug(1, 'Student entries data frame:', student_entries_df)
 
-courses = np.array([
+courses = numpy.array([
     ['1234', 'Physics'],
     ['5678', 'Economics'],
     ['1245', 'English'],
